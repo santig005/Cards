@@ -64,10 +64,10 @@ export async function register(formData: FormData) {
     ownerId: data.user.id,
   })
 
-  // Si hay sesión activa (email confirmation deshabilitado), ir al dashboard
+  // Si hay sesión activa (email confirmation deshabilitado), ir al onboarding
   // Si no hay sesión, el usuario debe confirmar su email primero
   if (data.session) {
-    redirect('/dashboard')
+    redirect('/onboarding')
   }
 
   return { success: 'Revisá tu email para confirmar tu cuenta antes de ingresar.' }
