@@ -4,7 +4,8 @@ import * as schema from './schema'
 
 const connectionString = process.env.DATABASE_URL!
 
-// Disable prefetch as it's not supported for Supabase's pooler (Transaction mode)
-const client = postgres(connectionString, { prepare: false })
+// prepare: false required for Supabase Transaction pooler (port 6543)
+// max: 1 keeps connection count low on serverless
+const client = postgres(connectionString, { prepare: false, max: 1 })
 
 export const db = drizzle(client, { schema })

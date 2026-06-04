@@ -14,9 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user) redirect('/login')
 
-  const tenant = user
-    ? await db.query.tenants.findFirst({ where: eq(tenants.ownerId, user.id) })
-    : null
+  const [tenant] = user
+    ? await db.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    : []
 
   return (
     <div className="min-h-screen bg-[#fafafe] flex">

@@ -27,24 +27,15 @@ export async function createProgram(formData: FormData) {
 
   if (!user) return { error: 'No autorizado' }
 
-  const tenant = await db.query.tenants.findFirst({
-    where: eq(tenants.ownerId, user.id),
-  })
+  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
 
   if (!tenant) return { error: 'Negocio no encontrado' }
 
-  // Update business name if changed
   if (result.data.businessName !== tenant.name) {
-    await db
-      .update(tenants)
-      .set({ name: result.data.businessName })
-      .where(eq(tenants.id, tenant.id))
+    await db.update(tenants).set({ name: result.data.businessName }).where(eq(tenants.id, tenant.id))
   }
 
-  // Upsert: update if exists, insert if not
-  const existing = await db.query.loyaltyPrograms.findFirst({
-    where: eq(loyaltyPrograms.tenantId, tenant.id),
-  })
+  const [existing] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant.id)).limit(1)
 
   if (existing) {
     await db

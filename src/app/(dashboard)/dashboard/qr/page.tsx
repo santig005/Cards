@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
@@ -14,15 +14,11 @@ export default async function QRPage() {
 
   if (!user) redirect('/login')
 
-  const tenant = await db.query.tenants.findFirst({
-    where: eq(tenants.ownerId, user.id),
-  })
+  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user!.id)).limit(1)
 
   if (!tenant) redirect('/login')
 
-  const program = await db.query.loyaltyPrograms.findFirst({
-    where: eq(loyaltyPrograms.tenantId, tenant!.id),
-  })
+  const [program] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant!.id)).limit(1)
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   const clientUrl = `${appUrl}/c/${tenant!.slug}`

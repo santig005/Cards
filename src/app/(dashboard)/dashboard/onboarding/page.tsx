@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+﻿import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
@@ -14,15 +14,11 @@ export default async function OnboardingPage() {
 
   if (!user) redirect('/login')
 
-  const tenant = await db.query.tenants.findFirst({
-    where: eq(tenants.ownerId, user.id),
-  })
+  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user!.id)).limit(1)
 
   if (!tenant) redirect('/login')
 
-  const existingProgram = await db.query.loyaltyPrograms.findFirst({
-    where: eq(loyaltyPrograms.tenantId, tenant.id),
-  })
+  const [existingProgram] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant!.id)).limit(1)
 
   const isEditing = !!existingProgram
 
