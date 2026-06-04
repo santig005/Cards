@@ -41,14 +41,30 @@ export async function createProgram(formData: FormData) {
       .where(eq(tenants.id, tenant.id))
   }
 
-  // Insert loyalty program
-  await db.insert(loyaltyPrograms).values({
-    tenantId: tenant.id,
-    stampsRequired: result.data.stampsRequired,
-    rewardType: result.data.rewardType,
-    rewardDescription: result.data.rewardDescription,
-    isActive: true,
+  // Upsert: update if exists, insert if not
+  const existing = await db.query.loyaltyPrograms.findFirst({
+    where: eq(loyaltyPrograms.tenantId, tenant.id),
   })
+
+  if (existing) {
+    await db
+      .update(loyaltyPrograms)
+      .set({
+        stampsRequired: result.data.stampsRequired,
+        rewardType: result.data.rewardType,
+        rewardDescription: result.data.rewardDescription,
+        updatedAt: new Date(),
+      })
+      .where(eq(loyaltyPrograms.id, existing.id))
+  } else {
+    await db.insert(loyaltyPrograms).values({
+      tenantId: tenant.id,
+      stampsRequired: result.data.stampsRequired,
+      rewardType: result.data.rewardType,
+      rewardDescription: result.data.rewardDescription,
+      isActive: true,
+    })
+  }
 
   redirect('/dashboard')
 }

@@ -5,8 +5,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createProgram } from './actions'
 
+interface ExistingProgram {
+  stampsRequired: number
+  rewardType: string
+  rewardDescription: string
+}
+
 interface OnboardingFormProps {
   defaultBusinessName: string
+  existingProgram?: ExistingProgram
 }
 
 const REWARD_OPTIONS = [
@@ -38,8 +45,10 @@ const REWARD_OPTIONS = [
 
 type RewardType = 'free_product' | 'discount_percent' | 'two_for_one' | 'custom'
 
-export function OnboardingForm({ defaultBusinessName }: OnboardingFormProps) {
-  const [selectedReward, setSelectedReward] = useState<RewardType>('free_product')
+export function OnboardingForm({ defaultBusinessName, existingProgram }: OnboardingFormProps) {
+  const [selectedReward, setSelectedReward] = useState<RewardType>(
+    (existingProgram?.rewardType as RewardType) ?? 'free_product'
+  )
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -72,7 +81,7 @@ export function OnboardingForm({ defaultBusinessName }: OnboardingFormProps) {
           name="stampsRequired"
           label="¿Cuántos sellos para la recompensa?"
           type="number"
-          defaultValue="10"
+          defaultValue={String(existingProgram?.stampsRequired ?? 10)}
           min={3}
           max={30}
           hint="Entre 3 y 30 sellos"
@@ -126,6 +135,7 @@ export function OnboardingForm({ defaultBusinessName }: OnboardingFormProps) {
           id="rewardDescription"
           name="rewardDescription"
           rows={3}
+          defaultValue={existingProgram?.rewardDescription ?? ''}
           placeholder={
             selectedReward === 'free_product'
               ? 'Ej: Un café americano mediano'
@@ -154,7 +164,7 @@ export function OnboardingForm({ defaultBusinessName }: OnboardingFormProps) {
         loading={isPending}
         className="w-full bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200"
       >
-        Comenzar a usar Sellio 🚀
+        {existingProgram ? 'Guardar cambios' : 'Comenzar a usar Sellio 🚀'}
       </Button>
     </form>
   )
