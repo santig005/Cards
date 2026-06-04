@@ -37,12 +37,15 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Instruction */}
-      <p className="text-center text-sm text-gray-500 mb-4">
-        Mostrá este QR en tu negocio para que los clientes acumulen sellos
-      </p>
+      <div className="flex items-center justify-center gap-2 mb-1">
+        <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+          <span className="text-base">📲</span>
+        </div>
+        <p className="text-sm font-medium text-gray-600">Mostrá este QR en tu negocio</p>
+      </div>
 
       {/* QR Code */}
-      <div className="bg-white rounded-2xl p-4 mx-auto w-fit shadow-inner">
+      <div className="bg-white rounded-3xl p-5 shadow-inner border border-gray-100 mx-auto w-fit">
         <QRCodeSVG
           id="qr-code-svg"
           value={url}
@@ -53,22 +56,22 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
         />
       </div>
 
-      {/* Link pill */}
-      <div className="bg-violet-50 border border-violet-100 rounded-xl px-4 py-2 text-sm font-mono text-violet-700 text-center break-all w-full">
-        {url}
+      {/* Link pill + copy button */}
+      <div className="mt-1 flex items-center gap-2 w-full">
+        <div className="flex-1 bg-violet-50 border border-violet-100 rounded-xl px-3 py-2 text-xs font-mono text-violet-600 truncate">
+          {url}
+        </div>
+        <button
+          onClick={handleCopy}
+          className={`shrink-0 h-9 px-3 rounded-xl text-xs font-semibold transition-colors ${
+            copied
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-violet-600 text-white hover:bg-violet-700'
+          }`}
+        >
+          {copied ? '✓' : 'Copiar'}
+        </button>
       </div>
-
-      {/* Copy button */}
-      <button
-        onClick={handleCopy}
-        className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
-          copied
-            ? 'bg-emerald-100 text-emerald-700'
-            : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
-        }`}
-      >
-        {copied ? '¡Copiado! ✓' : 'Copiar link'}
-      </button>
 
       {/* Download button */}
       <button

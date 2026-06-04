@@ -71,6 +71,15 @@ export default async function DashboardPage() {
 
       {!program ? (
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 p-8 text-white shadow-lg shadow-violet-200">
+          {/* Dot pattern overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+              backgroundSize: '18px 18px',
+              borderRadius: '16px',
+            }}
+          />
           <div className="relative z-10">
             <div className="text-4xl mb-3">🚀</div>
             <h2 className="text-xl font-bold mb-2">Configurá tu programa de fidelización</h2>
@@ -91,18 +100,43 @@ export default async function DashboardPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { label: 'Clientes', value: customerCount, emoji: '👥', color: 'text-violet-600' },
-              { label: 'Sellos entregados', value: stampCount, emoji: '🏅', color: 'text-amber-500' },
-              { label: 'Canjes', value: redeemCount, emoji: '🎁', color: 'text-emerald-500' },
+              {
+                label: 'Clientes',
+                value: customerCount,
+                icon: '👥',
+                bg: 'bg-violet-50',
+                iconBg: 'bg-violet-100',
+                valueColor: 'text-violet-700',
+                description: 'Total registrados',
+              },
+              {
+                label: 'Sellos dados',
+                value: stampCount,
+                icon: '🏅',
+                bg: 'bg-amber-50',
+                iconBg: 'bg-amber-100',
+                valueColor: 'text-amber-700',
+                description: 'Acumulados',
+              },
+              {
+                label: 'Canjes',
+                value: redeemCount,
+                icon: '🎁',
+                bg: 'bg-emerald-50',
+                iconBg: 'bg-emerald-100',
+                valueColor: 'text-emerald-700',
+                description: 'Recompensas entregadas',
+              },
             ].map((stat) => (
-              <Card key={stat.label} padding="md" className="hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
-                    <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+              <Card key={stat.label} padding="md" className={`${stat.bg} border-0 card-hover`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`w-10 h-10 rounded-xl ${stat.iconBg} flex items-center justify-center text-lg`}>
+                    {stat.icon}
                   </div>
-                  <span className="text-2xl">{stat.emoji}</span>
                 </div>
+                <p className={`text-3xl font-bold tabular-nums ${stat.valueColor}`}>{stat.value}</p>
+                <p className="text-sm font-medium text-gray-700 mt-0.5">{stat.label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{stat.description}</p>
               </Card>
             ))}
           </div>
@@ -126,13 +160,15 @@ export default async function DashboardPage() {
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/dashboard/qr" className="flex-1">
-              <Button size="lg" className="w-full bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200 text-base">
-                📱 Ver mi QR
+              <Button size="xl" className="w-full gap-3 bg-gradient-to-r from-violet-600 to-purple-700">
+                <span className="text-xl">📱</span>
+                <span>Ver mi QR</span>
               </Button>
             </Link>
             <Link href="/dashboard/clientes" className="flex-1">
-              <Button variant="secondary" size="lg" className="w-full text-base">
-                👥 Dar sello a cliente
+              <Button variant="outline" size="xl" className="w-full gap-3">
+                <span className="text-xl">👥</span>
+                <span>Registrar sello</span>
               </Button>
             </Link>
           </div>

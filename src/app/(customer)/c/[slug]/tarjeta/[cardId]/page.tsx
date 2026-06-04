@@ -40,11 +40,11 @@ function StampGrid({
             role="listitem"
             aria-label={isFilled ? 'Sello acumulado' : 'Sello pendiente'}
             className={`
-              w-11 h-11 rounded-full flex items-center justify-center text-lg transition-all duration-300
+              w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
               ${
                 isFilled
-                  ? 'bg-amber-400 shadow-lg shadow-amber-400/40 scale-100'
-                  : 'border-2 border-white/30 bg-white/10 scale-95 opacity-70'
+                  ? 'bg-amber-400 shadow-[0_0_12px_2px_rgba(251,191,36,0.4)] scale-100'
+                  : 'bg-white/10 border border-white/20 scale-95 opacity-70'
               }
             `}
           >
@@ -109,180 +109,177 @@ export default async function CardPage({ params }: PageProps) {
     100
   )
 
+  const cardBackground = isRedeemable
+    ? 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)'
+    : 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 40%, #6d28d9 70%, #7c3aed 100%)'
+
+  const cardShadow = isRedeemable
+    ? '0 25px 50px -12px rgba(6, 78, 59, 0.6), inset 0 1px 0 rgba(255,255,255,0.1)'
+    : '0 25px 50px -12px rgba(109, 40, 217, 0.6), inset 0 1px 0 rgba(255,255,255,0.1)'
+
   return (
-    <main className="min-h-screen bg-violet-50 flex flex-col items-center justify-center p-4 gap-6">
-      {/* Card */}
-      <div className="w-full max-w-sm">
-        {isRedeemable ? (
-          /* Redeemable state — emerald gradient */
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-8 shadow-2xl shadow-emerald-300/50">
-            {/* Decorative blobs */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-10 -translate-x-10" />
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex flex-col items-center py-8 px-4 gap-5">
+      {/* Page header */}
+      <div className="w-full max-w-sm flex items-center justify-between">
+        <Link
+          href={`/c/${slug}`}
+          className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition-colors"
+        >
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Volver
+        </Link>
+        {customer.name ? (
+          <span className="text-white/60 text-sm">{customer.name}</span>
+        ) : customer.phone ? (
+          <span className="text-white/60 text-sm">{customer.phone}</span>
+        ) : null}
+      </div>
 
-            <div className="relative z-10 space-y-6">
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-emerald-200 text-xs uppercase tracking-widest font-medium">
-                    Sellio
-                  </p>
-                  <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
-                  {customer.phone && (
-                    <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
-                  )}
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white">
-                  {tenant.name.charAt(0).toUpperCase()}
-                </div>
+      {/* Card wrapper — redeemable pulse ring */}
+      <div className="w-full max-w-sm relative">
+        {isRedeemable && (
+          <div
+            className="absolute inset-0 rounded-[28px] animate-ping bg-emerald-400/20 z-0"
+            style={{ animationDuration: '2s' }}
+          />
+        )}
+
+        {/* THE CARD */}
+        <div
+          className="relative rounded-[28px] overflow-hidden p-6 shadow-2xl z-10"
+          style={{ background: cardBackground, boxShadow: cardShadow }}
+        >
+          {/* Dot pattern texture */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+            }}
+          />
+
+          {/* Decorative circles */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/5" />
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5" />
+
+          <div className="relative z-10 space-y-5">
+            {/* Card header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <p
+                  className={`text-xs uppercase tracking-widest font-medium ${
+                    isRedeemable ? 'text-emerald-300' : 'text-violet-300'
+                  }`}
+                >
+                  Sellio
+                </p>
+                <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
+                {customer.phone && (
+                  <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
+                )}
               </div>
+              <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white shrink-0">
+                {tenant.name.charAt(0).toUpperCase()}
+              </div>
+            </div>
 
-              {/* Redeemable banner */}
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/30 animate-pulse">
-                <p className="text-4xl mb-2">🎁</p>
-                <p className="text-white font-bold text-lg">¡Recompensa lista!</p>
-                <p className="text-emerald-100 text-sm mt-1">
+            {/* Redeemable banner */}
+            {isRedeemable && (
+              <div className="glass rounded-2xl p-4 text-center border border-white/20">
+                <p className="text-white font-bold text-base">¡Recompensa lista!</p>
+                <p className="text-emerald-100 text-sm mt-0.5">
                   Mostrá esta pantalla al cajero para reclamar tu premio
                 </p>
               </div>
+            )}
 
-              {/* Stamp grid */}
-              <StampGrid
-                currentStamps={card.currentStamps}
-                stampsRequired={program.stampsRequired}
-              />
+            {/* Stamp grid */}
+            <StampGrid
+              currentStamps={card.currentStamps}
+              stampsRequired={program.stampsRequired}
+            />
 
-              {/* Reward description */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <p className="text-emerald-200 text-xs uppercase tracking-wider font-medium mb-1">
-                  Tu recompensa
-                </p>
-                <p className="text-white font-semibold">{program.rewardDescription}</p>
+            {/* Progress bar + count */}
+            <div className="space-y-2">
+              <div
+                className="h-2 rounded-full bg-white/15 overflow-hidden"
+                role="progressbar"
+                aria-valuenow={card.currentStamps}
+                aria-valuemin={0}
+                aria-valuemax={program.stampsRequired}
+              >
+                <div
+                  className="h-full rounded-full bg-amber-400 transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
               </div>
-
-              {/* Stats */}
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-emerald-200">
-                  <span className="text-white font-bold">{card.currentStamps}</span> /{' '}
+              <div className="flex items-center justify-between">
+                <span className="text-white/60 text-xs">
+                  <span className="text-white font-semibold">{card.currentStamps}</span>
+                  {' / '}
                   {program.stampsRequired} sellos
                 </span>
                 {card.totalRedeemed > 0 && (
-                  <span className="text-emerald-200">
-                    {card.totalRedeemed} canje{card.totalRedeemed !== 1 ? 's' : ''} realizados
-                  </span>
+                  <Badge variant="info" className="text-xs px-2 py-0.5">
+                    {card.totalRedeemed} {card.totalRedeemed === 1 ? 'canje' : 'canjes'}
+                  </Badge>
                 )}
               </div>
             </div>
           </div>
-        ) : (
-          /* Normal state — violet gradient */
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-violet-600 to-purple-700 p-8 shadow-2xl shadow-violet-300/40">
-            {/* Decorative blobs */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-10 -translate-x-10" />
+        </div>
+      </div>
 
-            <div className="relative z-10 space-y-6">
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-violet-300 text-xs uppercase tracking-widest font-medium">
-                    Sellio
-                  </p>
-                  <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
-                  {customer.phone && (
-                    <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
-                  )}
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white">
-                  {tenant.name.charAt(0).toUpperCase()}
-                </div>
-              </div>
-
-              {/* Stamp count */}
-              <div className="text-center space-y-1">
-                <p className="text-violet-300 text-xs uppercase tracking-wider">Tus sellos</p>
-                <p className="text-white">
-                  <span className="text-5xl font-bold tabular-nums">{card.currentStamps}</span>
-                  <span className="text-violet-300 text-xl">/{program.stampsRequired}</span>
-                </p>
-              </div>
-
-              {/* Stamp grid */}
-              <StampGrid
-                currentStamps={card.currentStamps}
-                stampsRequired={program.stampsRequired}
-              />
-
-              {/* Progress bar */}
-              <div className="space-y-1.5">
-                <div className="h-2 rounded-full bg-white/15 overflow-hidden">
+      {/* Reward info card */}
+      <div className="w-full max-w-sm">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-xl shrink-0">
+              🎁
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">
+                Próxima recompensa
+              </p>
+              <p className="font-semibold text-gray-900 text-sm">{program.rewardDescription}</p>
+              <div className="mt-2 space-y-1">
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-amber-400 transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500"
                     style={{ width: `${progressPercent}%` }}
-                    role="progressbar"
-                    aria-valuenow={card.currentStamps}
-                    aria-valuemin={0}
-                    aria-valuemax={program.stampsRequired}
                   />
                 </div>
-                <p className="text-violet-300 text-xs text-right">
-                  {program.stampsRequired - card.currentStamps} sellos para tu premio
+                <p className="text-xs text-gray-400">
+                  {isRedeemable
+                    ? '¡Recompensa lista para canjear!'
+                    : `${program.stampsRequired - card.currentStamps} sellos para tu premio`}
                 </p>
               </div>
-
-              {/* Reward description */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <p className="text-violet-300 text-xs uppercase tracking-wider font-medium mb-1">
-                  Próxima recompensa
-                </p>
-                <p className="text-white font-semibold">{program.rewardDescription}</p>
-              </div>
-
-              {/* Stats */}
-              {card.totalRedeemed > 0 && (
-                <p className="text-violet-300 text-sm text-center">
-                  {card.totalRedeemed} canje{card.totalRedeemed !== 1 ? 's' : ''} realizados
-                </p>
-              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Badges row */}
-      <div className="flex items-center gap-2 flex-wrap justify-center">
-        {isRedeemable && (
-          <Badge variant="success" className="text-sm px-3 py-1">
-            Recompensa disponible
-          </Badge>
-        )}
-        {card.totalRedeemed > 0 && (
-          <Badge variant="info" className="text-sm px-3 py-1">
-            {card.totalRedeemed} {card.totalRedeemed === 1 ? 'canje' : 'canjes'} realizados
-          </Badge>
-        )}
-        {customer.name && (
-          <Badge variant="default" className="text-sm px-3 py-1">
-            {customer.name}
-          </Badge>
-        )}
-      </div>
-
-      {/* Back button */}
-      <Link
-        href={`/c/${slug}`}
-        className="text-violet-600 text-sm font-medium hover:text-violet-800 transition-colors underline underline-offset-4"
-      >
-        ← Volver a {tenant.name}
-      </Link>
-      <p className="text-center text-xs text-gray-400 max-w-xs px-4">
+      {/* Save link tip */}
+      <p className="text-white/40 text-xs text-center max-w-xs px-4">
         💡 Guardá este link en tu celular para ver tu tarjeta cuando quieras
       </p>
 
       {/* Footer */}
       <footer className="pb-2 text-center">
-        <p className="text-xs text-gray-400">
-          Powered by <span className="text-violet-500 font-medium">Sellio</span>
+        <p className="text-xs text-white/30">
+          Powered by <span className="text-violet-400 font-medium">Sellio</span>
         </p>
       </footer>
     </main>

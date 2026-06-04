@@ -75,6 +75,18 @@ export default async function ClientesPage() {
         </Link>
       </div>
 
+      {/* Search hint — visual only */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+        </div>
+        <div className="h-10 pl-9 pr-4 w-full rounded-xl border border-gray-200 bg-white text-sm text-gray-400 flex items-center shadow-sm">
+          Buscar cliente por nombre o teléfono...
+        </div>
+      </div>
+
       <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
         <span className="text-xl">🏅</span>
         <p className="text-sm text-amber-800">
@@ -101,13 +113,14 @@ export default async function ClientesPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {customerList.map((c) => {
+          {customerList.map((c, index) => {
             const displayName = c.name ?? c.phone ?? c.email ?? 'Cliente'
             const currentStamps = c.currentStamps ?? 0
             const progress = Math.min((currentStamps / program.stampsRequired) * 100, 100)
+            const staggerClass = index < 5 ? `animate-fade-up stagger-${index + 1}` : ''
 
             return (
-              <Card key={c.customerId} padding="md" className="hover:shadow-md transition-all duration-150">
+              <Card key={c.customerId} padding="md" className={`hover:shadow-md transition-all duration-150 ${staggerClass}`}>
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center shrink-0">
                     <span className="text-violet-600 font-bold text-sm">

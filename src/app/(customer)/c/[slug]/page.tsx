@@ -22,8 +22,8 @@ function StampPreview({ count }: { count: number }) {
               w-9 h-9 rounded-full flex items-center justify-center transition-all
               ${
                 isFilled
-                  ? 'bg-amber-400 shadow-md shadow-amber-400/40'
-                  : 'border-2 border-white/30 bg-white/10 backdrop-blur-sm'
+                  ? 'bg-amber-400 shadow-[0_0_10px_2px_rgba(251,191,36,0.35)]'
+                  : 'border border-white/20 bg-white/10 backdrop-blur-sm'
               }
             `}
           >
@@ -60,11 +60,11 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
   if (!tenant) {
     return (
-      <main className="min-h-screen bg-violet-50 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">🔍</div>
-          <h1 className="text-2xl font-bold text-gray-800">Negocio no encontrado</h1>
-          <p className="text-gray-500">
+          <h1 className="text-2xl font-bold text-white">Negocio no encontrado</h1>
+          <p className="text-white/50">
             El enlace que visitaste no corresponde a ningún negocio registrado en Sellio.
           </p>
         </div>
@@ -80,11 +80,11 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
   if (!program) {
     return (
-      <main className="min-h-screen bg-violet-50 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">😴</div>
-          <h1 className="text-2xl font-bold text-gray-800">{tenant.name}</h1>
-          <p className="text-gray-500">
+          <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
+          <p className="text-white/50">
             Este negocio no tiene un programa de fidelización activo por el momento.
           </p>
         </div>
@@ -95,21 +95,21 @@ export default async function CustomerLandingPage({ params }: PageProps) {
   const stampsToShow = Math.min(program.stampsRequired, 12)
 
   return (
-    <main className="min-h-screen bg-violet-50 flex flex-col items-center justify-between p-4">
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex flex-col items-center justify-between p-4">
       {/* Hero header */}
       <div className="w-full max-w-sm pt-8 pb-4 text-center">
-        <div className="inline-flex items-center gap-1.5 text-violet-400 text-sm font-medium mb-6 bg-white/60 px-3 py-1 rounded-full backdrop-blur-sm">
-          <span className="text-violet-500">✦</span>
+        <div className="inline-flex items-center gap-1.5 text-violet-400 text-sm font-medium mb-6 bg-white/5 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">
+          <span className="text-violet-400">✦</span>
           <span>Sellio</span>
         </div>
 
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-violet-600 to-purple-700 p-8 shadow-2xl shadow-violet-300/40">
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-violet-600 to-purple-700 p-8 shadow-2xl shadow-violet-900/60">
           {/* Decorative blobs */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-12 translate-x-12" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-8 -translate-x-8" />
 
           <div className="relative z-10 space-y-6">
-            {/* Business name */}
+            {/* Business identity */}
             <div>
               {tenant.logoUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -160,11 +160,11 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
       {/* Phone form card */}
       <div className="w-full max-w-sm py-4">
-        <div className="bg-white rounded-3xl shadow-xl shadow-violet-100/60 p-6 space-y-5">
+        <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 space-y-5 border border-white/20">
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-gray-900">¿Ya sos cliente?</h2>
             <p className="text-gray-500 text-sm">
-              Ingresá tu número de celular para ver o crear tu tarjeta de fidelización.
+              Ingresá tu número para ver tu tarjeta de sellos.
             </p>
           </div>
 
@@ -174,9 +174,9 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
       {/* Footer */}
       <footer className="pb-6 text-center">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-white/40">
           Powered by{' '}
-          <span className="text-violet-500 font-medium">Sellio</span>
+          <span className="text-violet-400 font-medium">Sellio</span>
         </p>
       </footer>
     </main>
