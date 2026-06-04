@@ -27,13 +27,13 @@ export function MobileBottomNav() {
             key={item.href}
             href={item.href}
             className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium transition-colors duration-150 ${
-              active ? 'text-violet-700' : 'text-gray-400 hover:text-gray-600'
+              active ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
             <span className="text-lg leading-none">{item.emoji}</span>
             <span>{item.label}</span>
             {active && (
-              <span className="absolute bottom-0 w-8 h-0.5 bg-violet-500 rounded-t-full" />
+              <span className="absolute bottom-0 w-8 h-0.5 bg-amber-500 rounded-t-full" />
             )}
           </Link>
         )

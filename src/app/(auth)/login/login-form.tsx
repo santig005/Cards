@@ -50,7 +50,7 @@ export function LoginForm() {
         <div className="text-right">
           <button
             type="button"
-            className="text-xs text-gray-400 hover:text-violet-600 transition-colors"
+            className="text-xs text-stone-400 hover:text-amber-400 transition-colors"
           >
             ¿Olvidaste tu contraseña?
           </button>

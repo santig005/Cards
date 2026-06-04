@@ -99,21 +99,21 @@ export function OnboardingForm({ defaultBusinessName, existingProgram }: Onboard
               key={option.value}
               type="button"
               onClick={() => setSelectedReward(option.value)}
-              className={`relative flex flex-col items-start gap-1.5 rounded-2xl border-2 p-4 text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+              className={`relative flex flex-col items-start gap-1.5 rounded-2xl border-2 p-4 text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
                 selectedReward === option.value
-                  ? 'border-violet-500 bg-violet-50 shadow-sm shadow-violet-100'
+                  ? 'border-amber-500 bg-amber-50 shadow-sm shadow-amber-100'
                   : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
               }`}
             >
               {selectedReward === option.value && (
-                <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-white text-xs">
+                <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-stone-950 text-xs">
                   ✓
                 </span>
               )}
               <span className="text-2xl">{option.emoji}</span>
               <span
                 className={`text-sm font-semibold ${
-                  selectedReward === option.value ? 'text-violet-700' : 'text-gray-800'
+                  selectedReward === option.value ? 'text-amber-700' : 'text-gray-800'
                 }`}
               >
                 {option.label}
@@ -146,7 +146,7 @@ export function OnboardingForm({ defaultBusinessName, existingProgram }: Onboard
               : 'Describí la recompensa que vas a ofrecer…'
           }
           required
-          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm transition-colors hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none bg-white"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm transition-colors hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 resize-none bg-white"
         />
       </div>
 
@@ -162,7 +162,7 @@ export function OnboardingForm({ defaultBusinessName, existingProgram }: Onboard
         type="submit"
         size="lg"
         loading={isPending}
-        className="w-full bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200"
+        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]"
       >
         {existingProgram ? 'Guardar cambios' : 'Comenzar a usar Sellio 🚀'}
       </Button>

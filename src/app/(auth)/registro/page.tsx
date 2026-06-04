@@ -7,8 +7,8 @@ export default function RegisterPage() {
       <div className="mb-8">
         {/* Mobile logo — only visible when left panel is hidden */}
         <div className="md:hidden flex items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center">
-            <span className="text-white text-sm font-bold">S</span>
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
+            <span className="text-stone-950 text-sm font-bold">S</span>
           </div>
           <span className="font-bold text-gray-900">Sellio</span>
         </div>
@@ -23,7 +23,7 @@ export default function RegisterPage() {
 
       <p className="text-center text-sm text-gray-500 mt-6">
         ¿Ya tenés cuenta?{' '}
-        <Link href="/login" className="text-violet-600 font-semibold hover:text-violet-700">
+        <Link href="/login" className="text-amber-600 font-semibold hover:text-amber-700">
           Iniciá sesión →
         </Link>
       </p>

@@ -59,14 +59,14 @@ export default async function DashboardPage() {
         <div>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-gray-900">{tenant!.name}</h1>
-            <Badge variant="success">Activo</Badge>
+            <Badge variant="gold">Activo</Badge>
           </div>
           <p className="text-gray-500 text-sm mt-1">Bienvenido a tu panel de fidelización</p>
         </div>
       </div>
 
       {!program ? (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 to-purple-600 p-8 text-white shadow-lg shadow-violet-200">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-700 to-amber-800 p-8 text-white shadow-lg shadow-amber-200">
           {/* Dot pattern overlay */}
           <div
             className="absolute inset-0 opacity-[0.04]"
@@ -79,12 +79,12 @@ export default async function DashboardPage() {
           <div className="relative z-10">
             <div className="text-4xl mb-3">🚀</div>
             <h2 className="text-xl font-bold mb-2">Configurá tu programa de fidelización</h2>
-            <p className="text-violet-100 text-sm mb-6 max-w-md">
+            <p className="text-amber-100 text-sm mb-6 max-w-md">
               Aún no tenés un programa activo. Configurá las recompensas y comenzá a fidelizar
               a tus clientes hoy mismo.
             </p>
             <Link href="/dashboard/onboarding">
-              <Button variant="secondary" size="lg" className="bg-white text-violet-700 border-0 hover:bg-violet-50 shadow-lg">
+              <Button variant="secondary" size="lg" className="bg-white text-amber-700 border-0 hover:bg-amber-50 shadow-lg">
                 Configurar mi programa →
               </Button>
             </Link>
@@ -100,16 +100,16 @@ export default async function DashboardPage() {
                 label: 'Clientes',
                 value: customerCount,
                 icon: '👥',
-                bg: 'bg-violet-50',
-                iconBg: 'bg-violet-100',
-                valueColor: 'text-violet-700',
+                bg: 'bg-white border-l-4 border-amber-400',
+                iconBg: 'bg-stone-100',
+                valueColor: 'text-stone-700',
                 description: 'Total registrados',
               },
               {
                 label: 'Sellos dados',
                 value: stampCount,
                 icon: '🏅',
-                bg: 'bg-amber-50',
+                bg: 'bg-white border-l-4 border-amber-500',
                 iconBg: 'bg-amber-100',
                 valueColor: 'text-amber-700',
                 description: 'Acumulados',
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
                 label: 'Canjes',
                 value: redeemCount,
                 icon: '🎁',
-                bg: 'bg-emerald-50',
+                bg: 'bg-white border-l-4 border-emerald-500',
                 iconBg: 'bg-emerald-100',
                 valueColor: 'text-emerald-700',
                 description: 'Recompensas entregadas',
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             ))}
           </div>
 
-          <Card padding="md" className="border-violet-100">
+          <Card padding="md" className="border-amber-100">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">
@@ -149,14 +149,14 @@ export default async function DashboardPage() {
                 <p className="text-sm text-gray-500 mt-0.5">{program.rewardDescription}</p>
               </div>
               <Link href="/dashboard/onboarding">
-                <Button variant="ghost" size="sm">Editar ⚙️</Button>
+                <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">Editar ⚙️</Button>
               </Link>
             </div>
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/dashboard/qr" className="flex-1">
-              <Button size="xl" className="w-full gap-3 bg-gradient-to-r from-violet-600 to-purple-700">
+              <Button size="xl" className="w-full gap-3 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
                 <span className="text-xl">📱</span>
                 <span>Ver mi QR</span>
               </Button>

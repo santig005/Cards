@@ -29,8 +29,8 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
       {/* Logo / Brand */}
       <div className="py-5 px-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(124_58_237_/_0.4)] shrink-0">
-            <span className="text-white font-bold text-base">S</span>
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)] shrink-0">
+            <span className="text-stone-950 font-bold text-base">S</span>
           </div>
           <div className="min-w-0">
             <p className="font-bold text-gray-900 text-sm leading-tight truncate">{tenantName}</p>
@@ -49,8 +49,8 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
               href={item.href}
               className={`flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 active
-                  ? 'bg-violet-600 text-white shadow-[0_4px_12px_-2px_rgb(124_58_237_/_0.35)] pl-3 pr-3'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800 px-3'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.35)] pl-3 pr-3'
+                  : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800 px-3'
               }`}
             >
               <span className="text-base">{item.emoji}</span>
@@ -61,13 +61,13 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
       </nav>
 
       {/* Plan badge */}
-      <div className="mx-3 mb-3 rounded-xl bg-violet-50 border border-violet-100 px-3 py-2 flex items-center gap-2">
-        <div className="w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs shrink-0">
+      <div className="mx-3 mb-3 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 flex items-center gap-2">
+        <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-stone-950 text-xs shrink-0">
           ✦
         </div>
         <div>
-          <p className="text-xs font-semibold text-violet-700 leading-tight">Plan Básico</p>
-          <p className="text-[10px] text-violet-400">Gratis para siempre</p>
+          <p className="text-xs font-semibold text-amber-700 leading-tight">Plan Básico</p>
+          <p className="text-[10px] text-amber-500">Gratis para siempre</p>
         </div>
       </div>
 

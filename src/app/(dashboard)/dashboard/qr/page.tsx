@@ -52,11 +52,11 @@ export default async function QRPage() {
       </div>
 
       <div className="max-w-md mx-auto">
-        <Card padding="lg" className="border-violet-100 shadow-xl shadow-violet-50">
+        <Card padding="lg" className="border-amber-100 shadow-xl shadow-amber-50">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-100 rounded-full px-4 py-1.5">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 shrink-0" />
-              <span className="text-sm font-semibold text-violet-700">{tenant!.name}</span>
+            <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-1.5">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shrink-0" />
+              <span className="text-sm font-semibold text-amber-700">{tenant!.name}</span>
             </div>
           </div>
           <QRDisplay url={clientUrl} tenantName={tenant!.name} />
@@ -73,7 +73,7 @@ export default async function QRPage() {
 
         <div className="mt-4 text-center">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm">← Volver al dashboard</Button>
+            <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">← Volver al dashboard</Button>
           </Link>
         </div>
       </div>

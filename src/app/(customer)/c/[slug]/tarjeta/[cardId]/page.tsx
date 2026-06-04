@@ -43,14 +43,14 @@ function StampGrid({
               w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
               ${
                 isFilled
-                  ? 'bg-amber-400 shadow-[0_0_12px_2px_rgba(251,191,36,0.4)] scale-100'
-                  : 'bg-white/10 border border-white/20 scale-95 opacity-70'
+                  ? 'bg-stone-950/40 shadow-[0_0_12px_2px_rgba(0,0,0,0.2)] scale-100'
+                  : 'bg-stone-950/10 border border-stone-950/20 scale-95 opacity-70'
               }
             `}
           >
             {isFilled && (
               <svg
-                className="w-5 h-5 text-amber-900"
+                className="w-5 h-5 text-amber-200"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -111,19 +111,19 @@ export default async function CardPage({ params }: PageProps) {
 
   const cardBackground = isRedeemable
     ? 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)'
-    : 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 40%, #6d28d9 70%, #7c3aed 100%)'
+    : 'linear-gradient(135deg, #92400e 0%, #b45309 30%, #d97706 55%, #f59e0b 75%, #b45309 100%)'
 
   const cardShadow = isRedeemable
     ? '0 25px 50px -12px rgba(6, 78, 59, 0.6), inset 0 1px 0 rgba(255,255,255,0.1)'
-    : '0 25px 50px -12px rgba(109, 40, 217, 0.6), inset 0 1px 0 rgba(255,255,255,0.1)'
+    : '0 25px 50px -12px rgba(180, 83, 9, 0.6), inset 0 1px 0 rgba(255,255,255,0.15)'
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex flex-col items-center py-8 px-4 gap-5">
+    <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex flex-col items-center py-8 px-4 gap-5">
       {/* Page header */}
       <div className="w-full max-w-sm flex items-center justify-between">
         <Link
           href={`/c/${slug}`}
-          className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition-colors"
+          className="flex items-center gap-1.5 text-stone-400 hover:text-amber-400 text-sm transition-colors"
         >
           <svg
             className="w-4 h-4"
@@ -140,9 +140,9 @@ export default async function CardPage({ params }: PageProps) {
           Volver
         </Link>
         {customer.name ? (
-          <span className="text-white/60 text-sm">{customer.name}</span>
+          <span className="text-stone-400 text-sm">{customer.name}</span>
         ) : customer.phone ? (
-          <span className="text-white/60 text-sm">{customer.phone}</span>
+          <span className="text-stone-400 text-sm">{customer.phone}</span>
         ) : null}
       </div>
 
@@ -179,17 +179,35 @@ export default async function CardPage({ params }: PageProps) {
               <div>
                 <p
                   className={`text-xs uppercase tracking-widest font-medium ${
-                    isRedeemable ? 'text-emerald-300' : 'text-violet-300'
+                    isRedeemable ? 'text-emerald-300' : 'text-stone-900/60'
                   }`}
                 >
                   Sellio
                 </p>
-                <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
+                <h1
+                  className={`text-2xl font-bold mt-0.5 ${
+                    isRedeemable ? 'text-white' : 'text-stone-950'
+                  }`}
+                >
+                  {tenant.name}
+                </h1>
                 {customer.phone && (
-                  <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
+                  <p
+                    className={`text-xs mt-0.5 ${
+                      isRedeemable ? 'text-white/50' : 'text-stone-900/50'
+                    }`}
+                  >
+                    {customer.phone}
+                  </p>
                 )}
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white shrink-0">
+              <div
+                className={`w-12 h-12 rounded-2xl backdrop-blur-sm flex items-center justify-center text-xl font-bold shrink-0 ${
+                  isRedeemable
+                    ? 'bg-white/15 text-white'
+                    : 'bg-stone-950/20 text-stone-950'
+                }`}
+              >
                 {tenant.name.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -213,25 +231,39 @@ export default async function CardPage({ params }: PageProps) {
             {/* Progress bar + count */}
             <div className="space-y-2">
               <div
-                className="h-2 rounded-full bg-white/15 overflow-hidden"
+                className={`h-2 rounded-full overflow-hidden ${
+                  isRedeemable ? 'bg-white/15' : 'bg-stone-950/20'
+                }`}
                 role="progressbar"
                 aria-valuenow={card.currentStamps}
                 aria-valuemin={0}
                 aria-valuemax={program.stampsRequired}
               >
                 <div
-                  className="h-full rounded-full bg-amber-400 transition-all duration-500"
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    isRedeemable ? 'bg-emerald-400' : 'bg-stone-950/50'
+                  }`}
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-white/60 text-xs">
-                  <span className="text-white font-semibold">{card.currentStamps}</span>
+                <span
+                  className={`text-xs ${
+                    isRedeemable ? 'text-white/60' : 'text-stone-900/60'
+                  }`}
+                >
+                  <span
+                    className={`font-semibold ${
+                      isRedeemable ? 'text-white' : 'text-stone-950'
+                    }`}
+                  >
+                    {card.currentStamps}
+                  </span>
                   {' / '}
                   {program.stampsRequired} sellos
                 </span>
                 {card.totalRedeemed > 0 && (
-                  <Badge variant="info" className="text-xs px-2 py-0.5">
+                  <Badge variant="warning" className="text-xs px-2 py-0.5">
                     {card.totalRedeemed} {card.totalRedeemed === 1 ? 'canje' : 'canjes'}
                   </Badge>
                 )}
@@ -272,14 +304,14 @@ export default async function CardPage({ params }: PageProps) {
       </div>
 
       {/* Save link tip */}
-      <p className="text-white/40 text-xs text-center max-w-xs px-4">
+      <p className="text-stone-600 text-xs text-center max-w-xs px-4">
         💡 Guardá este link en tu celular para ver tu tarjeta cuando quieras
       </p>
 
       {/* Footer */}
       <footer className="pb-2 text-center">
-        <p className="text-xs text-white/30">
-          Powered by <span className="text-violet-400 font-medium">Sellio</span>
+        <p className="text-xs text-stone-600">
+          Powered by <span className="text-amber-500 font-medium">Sellio</span>
         </p>
       </footer>
     </main>

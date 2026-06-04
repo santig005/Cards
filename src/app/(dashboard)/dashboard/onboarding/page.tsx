@@ -23,22 +23,22 @@ export default async function OnboardingPage() {
   const isEditing = !!existingProgram
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white mb-8">
+        <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-2xl p-6 text-white mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
               {isEditing ? '✓' : '1'}
             </div>
-            <p className="text-violet-200 text-sm">
+            <p className="text-amber-100 text-sm">
               {isEditing ? 'Editando programa' : 'Configuración inicial'}
             </p>
           </div>
           <h1 className="text-2xl font-bold">
             {isEditing ? 'Editá tu programa' : 'Configurá tu programa'}
           </h1>
-          <p className="text-violet-200 text-sm mt-1">
+          <p className="text-amber-100 text-sm mt-1">
             {isEditing ? 'Los cambios se aplican de inmediato' : 'Solo tomará 2 minutos ⚡'}
           </p>
         </div>
@@ -50,7 +50,7 @@ export default async function OnboardingPage() {
                 <div
                   className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all ${
                     i === 1
-                      ? 'bg-violet-600 text-white shadow-sm shadow-violet-300'
+                      ? 'bg-amber-500 text-stone-950 shadow-sm shadow-amber-300'
                       : i === 0
                       ? 'bg-emerald-500 text-white'
                       : 'bg-gray-100 text-gray-400'
@@ -60,7 +60,7 @@ export default async function OnboardingPage() {
                 </div>
                 <span
                   className={`text-xs font-medium hidden sm:block ${
-                    i === 1 ? 'text-violet-700' : i === 0 ? 'text-emerald-600' : 'text-gray-400'
+                    i === 1 ? 'text-amber-700' : i === 0 ? 'text-emerald-600' : 'text-gray-400'
                   }`}
                 >
                   {step}
@@ -71,7 +71,7 @@ export default async function OnboardingPage() {
           </div>
         )}
 
-        <Card padding="lg" className="shadow-xl shadow-violet-100/50 border-violet-100">
+        <Card padding="lg" className="shadow-xl shadow-amber-100/50 border-amber-100">
           <OnboardingForm
             defaultBusinessName={tenant.name}
             existingProgram={existingProgram ?? undefined}

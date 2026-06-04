@@ -48,8 +48,8 @@ export function RegisterForm() {
   if (state?.success) {
     return (
       <div className="text-center py-8 space-y-3">
-        <div className="w-14 h-14 rounded-full bg-violet-50 flex items-center justify-center mx-auto">
-          <svg className="w-7 h-7 text-violet-600" viewBox="0 0 24 24" fill="none">
+        <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
+          <svg className="w-7 h-7 text-amber-600" viewBox="0 0 24 24" fill="none">
             <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>

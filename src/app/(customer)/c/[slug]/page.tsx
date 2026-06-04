@@ -22,14 +22,14 @@ function StampPreview({ count }: { count: number }) {
               w-9 h-9 rounded-full flex items-center justify-center transition-all
               ${
                 isFilled
-                  ? 'bg-amber-400 shadow-[0_0_10px_2px_rgba(251,191,36,0.35)]'
-                  : 'border border-white/20 bg-white/10 backdrop-blur-sm'
+                  ? 'bg-stone-950/30'
+                  : 'bg-stone-950/10 border border-stone-950/15'
               }
             `}
           >
             {isFilled && (
               <svg
-                className="w-4 h-4 text-amber-900"
+                className="w-4 h-4 text-stone-950"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -60,7 +60,7 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
   if (!tenant) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">🔍</div>
           <h1 className="text-2xl font-bold text-white">Negocio no encontrado</h1>
@@ -80,7 +80,7 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
   if (!program) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">😴</div>
           <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
@@ -95,15 +95,21 @@ export default async function CustomerLandingPage({ params }: PageProps) {
   const stampsToShow = Math.min(program.stampsRequired, 12)
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-violet-950 to-gray-950 flex flex-col items-center justify-between p-4">
+    <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex flex-col items-center justify-between p-4">
       {/* Hero header */}
       <div className="w-full max-w-sm pt-8 pb-4 text-center">
-        <div className="inline-flex items-center gap-1.5 text-violet-400 text-sm font-medium mb-6 bg-white/5 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">
-          <span className="text-violet-400">✦</span>
+        <div className="inline-flex items-center gap-1.5 text-amber-500 text-sm font-medium mb-6 bg-white/5 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">
+          <span className="text-amber-500">✦</span>
           <span>Sellio</span>
         </div>
 
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-violet-600 to-purple-700 p-8 shadow-2xl shadow-violet-900/60">
+        <div
+          className="relative rounded-3xl overflow-hidden p-8 shadow-2xl"
+          style={{
+            background: 'linear-gradient(135deg, #b45309 0%, #d97706 40%, #f59e0b 65%, #b45309 100%)',
+            boxShadow: '0 25px 50px -12px rgba(180, 83, 9, 0.5)',
+          }}
+        >
           {/* Decorative blobs */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-12 translate-x-12" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-8 -translate-x-8" />
@@ -116,40 +122,40 @@ export default async function CustomerLandingPage({ params }: PageProps) {
                 <img
                   src={tenant.logoUrl}
                   alt={`Logo de ${tenant.name}`}
-                  className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 ring-2 ring-white/20"
+                  className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 ring-2 ring-stone-950/20"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-white">
+                <div className="w-16 h-16 rounded-2xl bg-stone-950/20 backdrop-blur-sm mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-stone-950">
                   {tenant.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
-              <p className="text-violet-200 text-sm mt-1">Programa de fidelización</p>
+              <h1 className="text-2xl font-bold text-stone-950">{tenant.name}</h1>
+              <p className="text-stone-900/70 text-sm mt-1">Programa de fidelización</p>
             </div>
 
             {/* Reward info */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-left">
-              <p className="text-violet-200 text-xs uppercase tracking-wider font-medium mb-1">
+            <div className="bg-stone-950/20 backdrop-blur-sm rounded-2xl p-4 text-left border border-stone-950/10">
+              <p className="text-stone-950/80 text-xs uppercase tracking-wider font-medium mb-1">
                 Recompensa
               </p>
-              <p className="text-white font-semibold text-base leading-snug">
+              <p className="text-stone-950 font-semibold text-base leading-snug">
                 {program.rewardDescription}
               </p>
-              <p className="text-violet-300 text-sm mt-2">
+              <p className="text-stone-950/80 text-sm mt-2">
                 Acumulá{' '}
-                <span className="text-amber-300 font-bold">{program.stampsRequired} sellos</span> y
+                <span className="text-stone-950/60 font-bold">{program.stampsRequired} sellos</span> y
                 reclamá tu premio
               </p>
             </div>
 
             {/* Stamp preview */}
             <div className="space-y-2">
-              <p className="text-violet-300 text-xs text-center uppercase tracking-wider">
+              <p className="text-stone-950/60 text-xs text-center uppercase tracking-wider">
                 Vista previa
               </p>
               <StampPreview count={stampsToShow} />
               {program.stampsRequired > 12 && (
-                <p className="text-violet-300 text-xs text-center">
+                <p className="text-stone-950/60 text-xs text-center">
                   +{program.stampsRequired - 12} más
                 </p>
               )}
@@ -174,9 +180,9 @@ export default async function CustomerLandingPage({ params }: PageProps) {
 
       {/* Footer */}
       <footer className="pb-6 text-center">
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-stone-500">
           Powered by{' '}
-          <span className="text-violet-400 font-medium">Sellio</span>
+          <span className="text-amber-500 font-medium">Sellio</span>
         </p>
       </footer>
     </main>

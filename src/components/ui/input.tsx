@@ -5,22 +5,23 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string
   hint?: string
   icon?: React.ReactNode
+  dark?: boolean
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, icon, className = '', id, ...props }, ref) => {
+  ({ label, error, hint, icon, dark = false, className = '', id, ...props }, ref) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
 
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-gray-700 select-none">
+          <label htmlFor={inputId} className={`text-sm font-medium select-none ${dark ? 'text-stone-300' : 'text-stone-700'}`}>
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
               {icon}
             </div>
           )}
@@ -28,15 +29,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={`
-              h-11 w-full rounded-xl border bg-white text-sm text-gray-900
-              placeholder:text-gray-400
-              transition-all duration-150
-              focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50
+              h-11 w-full rounded-xl text-sm transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400
+              disabled:opacity-50 disabled:cursor-not-allowed
               ${icon ? 'pl-10 pr-3' : 'px-3.5'}
+              ${dark
+                ? 'bg-stone-800 border border-stone-700 text-stone-100 placeholder:text-stone-500 hover:border-stone-600'
+                : 'bg-white border text-stone-900 placeholder:text-stone-400'
+              }
               ${error
-                ? 'border-red-300 focus:ring-red-300/30 focus:border-red-400 bg-red-50/30'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-red-400 focus:ring-red-300/40'
+                : dark ? '' : 'border-stone-200 hover:border-stone-300'
               }
               ${className}
             `}
@@ -51,7 +54,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         )}
-        {hint && !error && <p className="text-xs text-gray-400">{hint}</p>}
+        {hint && !error && <p className={`text-xs ${dark ? 'text-stone-500' : 'text-stone-400'}`}>{hint}</p>}
       </div>
     )
   }

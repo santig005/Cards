@@ -102,7 +102,7 @@ export default async function ClientesPage() {
             </p>
           </div>
           <Link href="/dashboard/qr">
-            <Button size="md" className="bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg shadow-violet-200">
+            <Button size="md" className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
               Ver mi QR 📱
             </Button>
           </Link>
@@ -118,8 +118,8 @@ export default async function ClientesPage() {
             return (
               <Card key={c.customerId} padding="md" className={`hover:shadow-md transition-all duration-150 ${staggerClass}`}>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center shrink-0">
-                    <span className="text-violet-600 font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center shrink-0">
+                    <span className="text-amber-700 font-bold text-sm">
                       {displayName.charAt(0).toUpperCase()}
                     </span>
                   </div>

@@ -26,10 +26,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar */}
-        <header className="lg:hidden bg-white border-b border-gray-100 px-4 h-14 flex items-center justify-between sticky top-0 z-10">
+        <header className="lg:hidden bg-white border-b border-amber-100 px-4 h-14 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(124_58_237_/_0.4)]">
-              <span className="text-white text-xs font-bold">S</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)]">
+              <span className="text-stone-950 text-xs font-bold">S</span>
             </div>
             <span className="font-bold text-gray-900 text-sm">Sellio</span>
           </div>
