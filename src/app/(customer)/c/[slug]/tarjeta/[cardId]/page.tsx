@@ -9,6 +9,13 @@ interface PageProps {
   params: Promise<{ slug: string; cardId: string }>
 }
 
+function getStampGridClass(stampsRequired: number): string {
+  if (stampsRequired <= 5) return 'grid grid-cols-5 gap-2.5 justify-items-center'
+  if (stampsRequired <= 10) return 'grid grid-cols-5 gap-2.5 justify-items-center'
+  if (stampsRequired <= 12) return 'grid grid-cols-6 gap-2.5 justify-items-center'
+  return 'flex flex-wrap gap-2.5 justify-center'
+}
+
 function StampGrid({
   currentStamps,
   stampsRequired,
@@ -17,10 +24,11 @@ function StampGrid({
   stampsRequired: number
 }) {
   const stamps = Array.from({ length: stampsRequired })
+  const gridClass = getStampGridClass(stampsRequired)
 
   return (
     <div
-      className="flex flex-wrap gap-2.5 justify-center"
+      className={gridClass}
       role="list"
       aria-label={`${currentStamps} de ${stampsRequired} sellos`}
     >
@@ -120,6 +128,9 @@ export default async function CardPage({ params }: PageProps) {
                     Sellio
                   </p>
                   <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
+                  {customer.phone && (
+                    <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
+                  )}
                 </div>
                 <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white">
                   {tenant.name.charAt(0).toUpperCase()}
@@ -127,7 +138,7 @@ export default async function CardPage({ params }: PageProps) {
               </div>
 
               {/* Redeemable banner */}
-              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/30">
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/30 animate-pulse">
                 <p className="text-4xl mb-2">🎁</p>
                 <p className="text-white font-bold text-lg">¡Recompensa lista!</p>
                 <p className="text-emerald-100 text-sm mt-1">
@@ -178,6 +189,9 @@ export default async function CardPage({ params }: PageProps) {
                     Sellio
                   </p>
                   <h1 className="text-2xl font-bold text-white mt-0.5">{tenant.name}</h1>
+                  {customer.phone && (
+                    <p className="text-white/50 text-xs mt-0.5">{customer.phone}</p>
+                  )}
                 </div>
                 <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-white">
                   {tenant.name.charAt(0).toUpperCase()}
@@ -261,6 +275,9 @@ export default async function CardPage({ params }: PageProps) {
       >
         ← Volver a {tenant.name}
       </Link>
+      <p className="text-center text-xs text-gray-400 max-w-xs px-4">
+        💡 Guardá este link en tu celular para ver tu tarjeta cuando quieras
+      </p>
 
       {/* Footer */}
       <footer className="pb-2 text-center">

@@ -31,16 +31,13 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-purple-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-600 shadow-lg shadow-violet-200 mb-4">
-            <span className="text-2xl">🎯</span>
+        <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 text-white mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">1</div>
+            <p className="text-violet-200 text-sm">Configuración inicial</p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Configurá tu programa
-          </h1>
-          <p className="text-gray-500 text-base">
-            Configurá tu programa de fidelización en menos de 2 minutos.
-          </p>
+          <h1 className="text-2xl font-bold">Configurá tu programa</h1>
+          <p className="text-violet-200 text-sm mt-1">Solo tomará 2 minutos ⚡</p>
         </div>
 
         {/* Steps indicator */}

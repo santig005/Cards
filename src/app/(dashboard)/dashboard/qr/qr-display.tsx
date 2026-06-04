@@ -36,8 +36,13 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
 
   return (
     <div className="flex flex-col items-center gap-6">
+      {/* Instruction */}
+      <p className="text-center text-sm text-gray-500 mb-4">
+        Mostrá este QR en tu negocio para que los clientes acumulen sellos
+      </p>
+
       {/* QR Code */}
-      <div className="p-5 bg-white rounded-2xl border-2 border-violet-200 shadow-lg shadow-violet-100">
+      <div className="bg-white rounded-2xl p-4 mx-auto w-fit shadow-inner">
         <QRCodeSVG
           id="qr-code-svg"
           value={url}
@@ -48,29 +53,22 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
         />
       </div>
 
-      {/* Instruction */}
-      <p className="text-center text-sm text-gray-500 max-w-xs">
-        Mostrá este QR a tus clientes para que acumulen sellos. Pueden escanearlo con la cámara
-        de su celular, sin necesidad de descargar ninguna app.
-      </p>
-
-      {/* Link */}
-      <div className="w-full">
-        <p className="text-xs font-medium text-gray-500 mb-2 text-center">Link directo</p>
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-200 px-4 py-3">
-          <span className="flex-1 text-sm text-gray-700 truncate font-mono">{url}</span>
-          <button
-            onClick={handleCopy}
-            className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
-              copied
-                ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
-            }`}
-          >
-            {copied ? '✓ Copiado' : 'Copiar'}
-          </button>
-        </div>
+      {/* Link pill */}
+      <div className="bg-violet-50 border border-violet-100 rounded-xl px-4 py-2 text-sm font-mono text-violet-700 text-center break-all w-full">
+        {url}
       </div>
+
+      {/* Copy button */}
+      <button
+        onClick={handleCopy}
+        className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
+          copied
+            ? 'bg-emerald-100 text-emerald-700'
+            : 'bg-violet-100 text-violet-700 hover:bg-violet-200'
+        }`}
+      >
+        {copied ? '¡Copiado! ✓' : 'Copiar link'}
+      </button>
 
       {/* Download button */}
       <button

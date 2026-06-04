@@ -62,6 +62,9 @@ export function PhoneForm({ slug }: PhoneFormProps) {
       >
         {loading ? 'Buscando tu tarjeta...' : 'Ver mi tarjeta'}
       </Button>
+      <p className="text-center text-xs text-gray-400 pt-1">
+        No compartimos tu número con terceros
+      </p>
     </form>
   )
 }

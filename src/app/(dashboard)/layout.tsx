@@ -4,6 +4,7 @@ import { db } from '@/lib/drizzle/db'
 import { tenants } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { SidebarNav } from '@/components/features/sidebar-nav'
+import { MobileBottomNav } from '@/components/features/mobile-bottom-nav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -35,9 +36,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <span className="text-xs text-gray-400 truncate max-w-[160px]">{user.email}</span>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto pb-20 lg:pb-0">
           {children}
         </main>
+
+        {/* Mobile bottom nav */}
+        <MobileBottomNav />
       </div>
     </div>
   )

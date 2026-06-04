@@ -8,15 +8,42 @@ interface PageProps {
 }
 
 function StampPreview({ count }: { count: number }) {
+  const filledCount = Math.min(3, count)
+
   return (
     <div className="flex flex-wrap gap-2 justify-center">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className="w-9 h-9 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-sm"
-          aria-hidden="true"
-        />
-      ))}
+      {Array.from({ length: count }).map((_, i) => {
+        const isFilled = i < filledCount
+        return (
+          <div
+            key={i}
+            aria-hidden="true"
+            className={`
+              w-9 h-9 rounded-full flex items-center justify-center transition-all
+              ${
+                isFilled
+                  ? 'bg-amber-400 shadow-md shadow-amber-400/40'
+                  : 'border-2 border-white/30 bg-white/10 backdrop-blur-sm'
+              }
+            `}
+          >
+            {isFilled && (
+              <svg
+                className="w-4 h-4 text-amber-900"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

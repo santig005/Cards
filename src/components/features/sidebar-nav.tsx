@@ -47,10 +47,10 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+              className={`flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                 active
-                  ? 'bg-violet-50 text-violet-700 shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-violet-50 text-violet-700 shadow-sm border-l-2 border-violet-500 pl-[10px] pr-3'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 px-3'
               }`}
             >
               <span className="text-base">{item.emoji}</span>
@@ -62,6 +62,17 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
           )
         })}
       </nav>
+
+      {/* Plan badge */}
+      <div className="px-3 py-3 border-t border-gray-100 mt-auto">
+        <div className="bg-violet-50 rounded-xl px-3 py-2.5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold text-violet-700">Plan Básico</p>
+            <p className="text-xs text-gray-400">Gratis para siempre</p>
+          </div>
+          <span className="text-violet-500 text-xs">✦</span>
+        </div>
+      </div>
 
       {/* Logout */}
       <div className="px-3 py-4 border-t border-gray-100">
