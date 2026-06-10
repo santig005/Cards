@@ -28,5 +28,20 @@
       "changeNumber": "Usar outro número",
       "errorGeneric": "Ocorreu um erro inesperado. Tente novamente."
     }
+  },
+  "card": {
+    "back": "Voltar",
+    "redeemableTitle": "Recompensa pronta!",
+    "redeemableBody": "Mostre esta tela ao caixa para resgatar seu prêmio",
+    "stampsOf": "{current} / {required} selos",
+    "redemptions": "{count, plural, one {# resgate} other {# resgates}}",
+    "nextReward": "Próxima recompensa",
+    "readyToRedeem": "Recompensa pronta para resgatar!",
+    "stampsToGo": "{count} selos para seu prêmio",
+    "saveTip": "💡 Salve este link no seu celular para ver seu cartão quando quiser",
+    "logout": "Não é você? Sair",
+    "gridLabel": "{current} de {required} selos",
+    "stampFilled": "Selo acumulado",
+    "stampEmpty": "Selo pendente"
   }
 }

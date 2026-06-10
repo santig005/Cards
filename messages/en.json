@@ -28,5 +28,20 @@
       "changeNumber": "Use another number",
       "errorGeneric": "Something went wrong. Please try again."
     }
+  },
+  "card": {
+    "back": "Back",
+    "redeemableTitle": "Reward ready!",
+    "redeemableBody": "Show this screen to the cashier to claim your reward",
+    "stampsOf": "{current} / {required} stamps",
+    "redemptions": "{count, plural, one {# redemption} other {# redemptions}}",
+    "nextReward": "Next reward",
+    "readyToRedeem": "Reward ready to redeem!",
+    "stampsToGo": "{count} stamps to your reward",
+    "saveTip": "💡 Save this link on your phone to check your card anytime",
+    "logout": "Not you? Log out",
+    "gridLabel": "{current} of {required} stamps",
+    "stampFilled": "Stamp earned",
+    "stampEmpty": "Stamp pending"
   }
 }

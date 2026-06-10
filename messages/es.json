@@ -28,5 +28,20 @@
       "changeNumber": "Usar otro número",
       "errorGeneric": "Ocurrió un error inesperado. Intentá de nuevo."
     }
+  },
+  "card": {
+    "back": "Volver",
+    "redeemableTitle": "¡Recompensa lista!",
+    "redeemableBody": "Mostrá esta pantalla al cajero para reclamar tu premio",
+    "stampsOf": "{current} / {required} sellos",
+    "redemptions": "{count, plural, one {# canje} other {# canjes}}",
+    "nextReward": "Próxima recompensa",
+    "readyToRedeem": "¡Recompensa lista para canjear!",
+    "stampsToGo": "{count} sellos para tu premio",
+    "saveTip": "💡 Guardá este link en tu celular para ver tu tarjeta cuando quieras",
+    "logout": "¿No sos vos? Cerrar sesión",
+    "gridLabel": "{current} de {required} sellos",
+    "stampFilled": "Sello acumulado",
+    "stampEmpty": "Sello pendiente"
   }
 }

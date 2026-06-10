@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { db, withAuth } from '@/lib/drizzle/db'
 import { loyaltyCards, tenants, loyaltyPrograms, customers } from '@/lib/drizzle/schema'
@@ -21,26 +22,28 @@ function getStampGridClass(stampsRequired: number): string {
 function StampGrid({
   currentStamps,
   stampsRequired,
+  gridLabel,
+  filledLabel,
+  emptyLabel,
 }: {
   currentStamps: number
   stampsRequired: number
+  gridLabel: string
+  filledLabel: string
+  emptyLabel: string
 }) {
   const stamps = Array.from({ length: stampsRequired })
   const gridClass = getStampGridClass(stampsRequired)
 
   return (
-    <div
-      className={gridClass}
-      role="list"
-      aria-label={`${currentStamps} de ${stampsRequired} sellos`}
-    >
+    <div className={gridClass} role="list" aria-label={gridLabel}>
       {stamps.map((_, i) => {
         const isFilled = i < currentStamps
         return (
           <div
             key={i}
             role="listitem"
-            aria-label={isFilled ? 'Sello acumulado' : 'Sello pendiente'}
+            aria-label={isFilled ? filledLabel : emptyLabel}
             className={`
               w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
               ${
@@ -73,6 +76,7 @@ function StampGrid({
 
 export default async function CardPage({ params }: PageProps) {
   const { slug, cardId } = await params
+  const t = await getTranslations('card')
 
   // La tarjeta es privada: requiere sesión del cliente.
   const supabase = await createClient()
@@ -150,7 +154,7 @@ export default async function CardPage({ params }: PageProps) {
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          Volver
+          {t('back')}
         </Link>
         {customer.name ? (
           <span className="text-stone-400 text-sm">{customer.name}</span>
@@ -233,10 +237,8 @@ export default async function CardPage({ params }: PageProps) {
             {/* Redeemable banner */}
             {isRedeemable && (
               <div className="glass rounded-2xl p-4 text-center border border-white/20">
-                <p className="text-white font-bold text-base">¡Recompensa lista!</p>
-                <p className="text-emerald-100 text-sm mt-0.5">
-                  Mostrá esta pantalla al cajero para reclamar tu premio
-                </p>
+                <p className="text-white font-bold text-base">{t('redeemableTitle')}</p>
+                <p className="text-emerald-100 text-sm mt-0.5">{t('redeemableBody')}</p>
               </div>
             )}
 
@@ -244,6 +246,9 @@ export default async function CardPage({ params }: PageProps) {
             <StampGrid
               currentStamps={card.currentStamps}
               stampsRequired={program.stampsRequired}
+              gridLabel={t('gridLabel', { current: card.currentStamps, required: program.stampsRequired })}
+              filledLabel={t('stampFilled')}
+              emptyLabel={t('stampEmpty')}
             />
 
             {/* Progress bar + count */}
@@ -266,23 +271,15 @@ export default async function CardPage({ params }: PageProps) {
               </div>
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs ${
-                    isRedeemable ? 'text-white/60' : 'text-stone-900/60'
+                  className={`text-xs font-semibold ${
+                    isRedeemable ? 'text-white' : 'text-stone-950'
                   }`}
                 >
-                  <span
-                    className={`font-semibold ${
-                      isRedeemable ? 'text-white' : 'text-stone-950'
-                    }`}
-                  >
-                    {card.currentStamps}
-                  </span>
-                  {' / '}
-                  {program.stampsRequired} sellos
+                  {t('stampsOf', { current: card.currentStamps, required: program.stampsRequired })}
                 </span>
                 {card.totalRedeemed > 0 && (
                   <Badge variant="warning" className="text-xs px-2 py-0.5">
-                    {card.totalRedeemed} {card.totalRedeemed === 1 ? 'canje' : 'canjes'}
+                    {t('redemptions', { count: card.totalRedeemed })}
                   </Badge>
                 )}
               </div>
@@ -300,7 +297,7 @@ export default async function CardPage({ params }: PageProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">
-                Próxima recompensa
+                {t('nextReward')}
               </p>
               <p className="font-semibold text-gray-900 text-sm">{program.rewardDescription}</p>
               <div className="mt-2 space-y-1">
@@ -312,8 +309,8 @@ export default async function CardPage({ params }: PageProps) {
                 </div>
                 <p className="text-xs text-gray-400">
                   {isRedeemable
-                    ? '¡Recompensa lista para canjear!'
-                    : `${program.stampsRequired - card.currentStamps} sellos para tu premio`}
+                    ? t('readyToRedeem')
+                    : t('stampsToGo', { count: program.stampsRequired - card.currentStamps })}
                 </p>
               </div>
             </div>
@@ -322,9 +319,7 @@ export default async function CardPage({ params }: PageProps) {
       </div>
 
       {/* Save link tip */}
-      <p className="text-stone-600 text-xs text-center max-w-xs px-4">
-        💡 Guardá este link en tu celular para ver tu tarjeta cuando quieras
-      </p>
+      <p className="text-stone-600 text-xs text-center max-w-xs px-4">{t('saveTip')}</p>
 
       {/* Footer */}
       <footer className="pb-2 text-center space-y-2">
@@ -333,7 +328,7 @@ export default async function CardPage({ params }: PageProps) {
             type="submit"
             className="text-xs text-stone-500 hover:text-amber-400 underline underline-offset-2 transition-colors"
           >
-            ¿No sos vos? Cerrar sesión
+            {t('logout')}
           </button>
         </form>
         <p className="text-xs text-stone-600">
