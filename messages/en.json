@@ -1,0 +1,47 @@
+{
+  "common": {
+    "language": "Language"
+  },
+  "customer": {
+    "notFoundTitle": "Business not found",
+    "notFoundBody": "The link you visited doesn't match any business registered on Sellio.",
+    "inactiveBody": "This business doesn't have an active loyalty program right now.",
+    "tagline": "Loyalty program",
+    "rewardLabel": "Reward",
+    "accumulate": "Collect {count} stamps and claim your reward",
+    "preview": "Preview",
+    "more": "+{count} more",
+    "cardTitle": "Already a customer?",
+    "cardSubtitle": "Enter your number to see your stamp card.",
+    "poweredBy": "Powered by",
+    "form": {
+      "phoneLabel": "Your mobile number",
+      "phoneHint": "We'll send you a code on WhatsApp to identify you",
+      "continue": "Continue with WhatsApp",
+      "sending": "Sending code...",
+      "habeas": "By continuing you accept the processing of your number under applicable data protection law. We don't share your information with third parties.",
+      "codeLabel": "Verification code",
+      "codeHint": "Check your WhatsApp and enter the 6-digit code",
+      "verify": "See my card",
+      "verifying": "Verifying...",
+      "sentTo": "We sent a code on WhatsApp to {phone}.",
+      "changeNumber": "Use another number",
+      "errorGeneric": "Something went wrong. Please try again."
+    }
+  },
+  "card": {
+    "back": "Back",
+    "redeemableTitle": "Reward ready!",
+    "redeemableBody": "Show this screen to the cashier to claim your reward",
+    "stampsOf": "{current} / {required} stamps",
+    "redemptions": "{count, plural, one {# redemption} other {# redemptions}}",
+    "nextReward": "Next reward",
+    "readyToRedeem": "Reward ready to redeem!",
+    "stampsToGo": "{count} stamps to your reward",
+    "saveTip": "💡 Save this link on your phone to check your card anytime",
+    "logout": "Not you? Log out",
+    "gridLabel": "{current} of {required} stamps",
+    "stampFilled": "Stamp earned",
+    "stampEmpty": "Stamp pending"
+  }
+}

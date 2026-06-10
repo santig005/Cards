@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale } from 'next-intl/server'
 import './globals.css'
 
 const geist = Geist({
@@ -19,10 +21,14 @@ export const viewport: Viewport = {
   themeColor: '#f59e0b',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+
   return (
-    <html lang="es" className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-surface text-gray-900">{children}</body>
+    <html lang={locale} className={`${geist.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-surface text-gray-900">
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   )
 }
