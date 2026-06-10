@@ -5,22 +5,67 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CustomerItem, type CustomerRow } from './customer-item'
+import { toCsv } from '@/lib/csv'
 
 interface CustomerListProps {
   customers: CustomerRow[]
   stampsRequired: number
 }
 
+type SortBy = 'recent' | 'name' | 'stamps'
+const PAGE_SIZE = 10
+
+const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: 'recent', label: 'Más recientes' },
+  { value: 'name', label: 'Nombre (A-Z)' },
+  { value: 'stamps', label: 'Más sellos' },
+]
+
+function downloadCustomersCsv(customers: CustomerRow[]) {
+  const headers = ['Nombre', 'Teléfono', 'Email', 'Sellos actuales', 'Canjes totales', 'Registrado']
+  const rows = customers.map((c) => [
+    c.name ?? '',
+    c.phone,
+    c.email ?? '',
+    c.currentStamps ?? 0,
+    c.totalRedeemed ?? 0,
+    new Date(c.createdAt).toISOString().slice(0, 10),
+  ])
+  // BOM (﻿) para que Excel respete los acentos.
+  const csv = '﻿' + toCsv(headers, rows)
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `clientes-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
   const [query, setQuery] = useState('')
+  const [sortBy, setSortBy] = useState<SortBy>('recent')
+  const [page, setPage] = useState(0)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return customers
-    return customers.filter((c) =>
-      [c.name, c.phone, c.email].some((field) => field?.toLowerCase().includes(q))
-    )
-  }, [customers, query])
+    const base = !q
+      ? customers
+      : customers.filter((c) => [c.name, c.phone, c.email].some((f) => f?.toLowerCase().includes(q)))
+
+    return [...base].sort((a, b) => {
+      if (sortBy === 'name') return (a.name ?? a.phone).localeCompare(b.name ?? b.phone)
+      if (sortBy === 'stamps') return (b.currentStamps ?? 0) - (a.currentStamps ?? 0)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() // recientes
+    })
+  }, [customers, query, sortBy])
+
+  // Clamp de la página en render (evita un useEffect): si el filtro achicó la
+  // lista, la página fuera de rango se ajusta sola.
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const safePage = Math.min(page, pageCount - 1)
+  const start = safePage * PAGE_SIZE
+  const paged = filtered.slice(start, start + PAGE_SIZE)
 
   // Sin clientes registrados todavía.
   if (customers.length === 0) {
@@ -45,21 +90,44 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
 
   return (
     <div className="space-y-4">
-      {/* Buscador */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-          </svg>
+      {/* Controles: buscar + ordenar + exportar */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </div>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(0)
+            }}
+            placeholder="Buscar cliente por nombre o teléfono..."
+            aria-label="Buscar cliente"
+            className="h-10 pl-9 pr-4 w-full rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
+          />
         </div>
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar cliente por nombre o teléfono..."
-          aria-label="Buscar cliente"
-          className="h-10 pl-9 pr-4 w-full rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
-        />
+        <select
+          value={sortBy}
+          onChange={(e) => {
+            setSortBy(e.target.value as SortBy)
+            setPage(0)
+          }}
+          aria-label="Ordenar clientes"
+          className="h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
+        >
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <Button type="button" variant="outline" size="md" onClick={() => downloadCustomersCsv(customers)} className="shrink-0">
+          ⬇️ CSV
+        </Button>
       </div>
 
       {filtered.length === 0 ? (
@@ -70,11 +138,41 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
           </p>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((c, index) => (
-            <CustomerItem key={c.customerId} customer={c} stampsRequired={stampsRequired} index={index} />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {paged.map((c, index) => (
+              <CustomerItem key={c.customerId} customer={c} stampsRequired={stampsRequired} index={index} />
+            ))}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-xs text-gray-400 tabular-nums">
+                {start + 1}–{Math.min(start + PAGE_SIZE, filtered.length)} de {filtered.length}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPage(Math.max(0, safePage - 1))}
+                  disabled={safePage === 0}
+                >
+                  ← Anterior
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}
+                  disabled={safePage >= pageCount - 1}
+                >
+                  Siguiente →
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

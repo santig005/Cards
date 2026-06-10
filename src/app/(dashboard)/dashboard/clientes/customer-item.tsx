@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +13,7 @@ export interface CustomerRow {
   phone: string
   name: string | null
   email: string | null
+  createdAt: Date
   cardId: string | null
   currentStamps: number | null
   totalRedeemed: number | null
@@ -88,6 +90,14 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
+          <Link
+            href={`/dashboard/clientes/${customer.customerId}`}
+            aria-label="Ver detalle del cliente"
+            title="Ver detalle"
+            className="w-8 h-8 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
+          >
+            👁️
+          </Link>
           <button
             type="button"
             onClick={() => {
