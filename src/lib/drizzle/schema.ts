@@ -1,0 +1,85 @@
+import { pgTable, uuid, text, integer, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core'
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+export const rewardTypeEnum = pgEnum('reward_type', ['free_product', 'discount_percent', 'two_for_one', 'custom'])
+
+// ─── Tenants (negocios) ───────────────────────────────────────────────────────
+
+export const tenants = pgTable('tenants', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  logoUrl: text('logo_url'),
+  ownerId: uuid('owner_id').notNull(), // ref → auth.users
+  collectCustomerData: boolean('collect_customer_data').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// ─── Loyalty programs (una por tenant en MVP) ─────────────────────────────────
+
+export const loyaltyPrograms = pgTable('loyalty_programs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(), // RLS anchor
+  stampsRequired: integer('stamps_required').notNull().default(10),
+  rewardType: rewardTypeEnum('reward_type').notNull().default('custom'),
+  rewardDescription: text('reward_description').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// ─── Customers (clientes del negocio) ────────────────────────────────────────
+
+export const customers = pgTable('customers', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(), // RLS anchor
+  phone: text('phone').notNull(),
+  name: text('name'),
+  email: text('email'),
+  authUserId: uuid('auth_user_id'), // ref → auth.users (nullable: se asigna tras OTP)
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// ─── Loyalty cards (una por cliente por programa) ─────────────────────────────
+
+export const loyaltyCards = pgTable('loyalty_cards', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(), // RLS anchor
+  customerId: uuid('customer_id').notNull(),
+  programId: uuid('program_id').notNull(),
+  currentStamps: integer('current_stamps').notNull().default(0),
+  totalRedeemed: integer('total_redeemed').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// ─── Stamp events (auditoría de cada sello) ───────────────────────────────────
+
+export const stampEvents = pgTable('stamp_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(), // RLS anchor
+  cardId: uuid('card_id').notNull(),
+  customerId: uuid('customer_id').notNull(),
+  registeredById: uuid('registered_by_id').notNull(), // empleado que dio el sello
+  eventType: text('event_type', { enum: ['stamp', 'redeem'] }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type Tenant = typeof tenants.$inferSelect
+export type NewTenant = typeof tenants.$inferInsert
+
+export type LoyaltyProgram = typeof loyaltyPrograms.$inferSelect
+export type NewLoyaltyProgram = typeof loyaltyPrograms.$inferInsert
+
+export type Customer = typeof customers.$inferSelect
+export type NewCustomer = typeof customers.$inferInsert
+
+export type LoyaltyCard = typeof loyaltyCards.$inferSelect
+export type NewLoyaltyCard = typeof loyaltyCards.$inferInsert
+
+export type StampEvent = typeof stampEvents.$inferSelect
+export type NewStampEvent = typeof stampEvents.$inferInsert

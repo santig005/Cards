@@ -1,0 +1,13 @@
+# Aprobación de scripts de build de dependencias.
+#
+# pnpm 10+ no corre los build scripts de dependencias por defecto (seguridad);
+# en CI un build "sin decidir" hace fallar la instalación con
+# ERR_PNPM_IGNORED_BUILDS. pnpm 11 usa este mapa `allowBuilds` (true/false por
+# paquete) — NO `onlyBuiltDependencies`. Estos tres tienen binarios nativos:
+#   esbuild       → lo usan vitest y drizzle-kit
+#   sharp         → optimización de imágenes de Next
+#   unrs-resolver → resolver de eslint
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
