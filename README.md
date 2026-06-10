@@ -98,6 +98,7 @@ El CI (`.github/workflows/ci.yml`) corre lint → typecheck → test → build e
 - [`docs/data-model.md`](docs/data-model.md) — Schema de la base de datos
 - [`docs/adr/`](docs/adr/) — Architecture Decision Records
 - [`docs/phases/`](docs/phases/) — Fases del producto
+- [`docs/lista-de-deseos.md`](docs/lista-de-deseos.md) — Backlog de ideas (incluye multi-país y multi-idioma)
 
 ## Arquitectura multi-tenant
 
