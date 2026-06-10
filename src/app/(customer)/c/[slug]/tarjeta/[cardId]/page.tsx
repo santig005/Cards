@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { db } from '@/lib/drizzle/db'
+import { notFound, redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { db, withAuth } from '@/lib/drizzle/db'
 import { loyaltyCards, tenants, loyaltyPrograms, customers } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
@@ -72,34 +73,45 @@ function StampGrid({
 export default async function CardPage({ params }: PageProps) {
   const { slug, cardId } = await params
 
-  // Fetch the loyalty card
-  const [card] = await db
-    .select()
-    .from(loyaltyCards)
-    .where(eq(loyaltyCards.id, cardId))
-    .limit(1)
+  // La tarjeta es privada: requiere sesión del cliente.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect(`/c/${slug}`)
 
-  if (!card) {
-    notFound()
-  }
+  // Tarjeta + ficha: SOLO las del cliente autenticado. RLS bloquea cualquier
+  // tarjeta ajena, así que si el cardId no es suyo, `card` viene vacío → 404.
+  const owned = await withAuth(user.id, async (tx) => {
+    const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
+    if (!card) return null
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, card.customerId))
+      .limit(1)
+    return { card, customer: customer ?? null }
+  })
 
-  // Fetch related data in parallel
-  const [tenantResult, programResult, customerResult] = await Promise.all([
+  if (!owned || !owned.customer) notFound()
+  const { card } = owned
+  const customer = owned.customer
+
+  // Info pública del negocio (nombre, recompensa) vía servicio.
+  const [tenantResult, programResult] = await Promise.all([
     db.select().from(tenants).where(eq(tenants.id, card.tenantId)).limit(1),
     db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.id, card.programId)).limit(1),
-    db.select().from(customers).where(eq(customers.id, card.customerId)).limit(1),
   ])
 
   const tenant = tenantResult[0]
   const program = programResult[0]
-  const customer = customerResult[0]
 
   // Verify tenant slug matches URL param (security)
   if (!tenant || tenant.slug !== slug) {
     notFound()
   }
 
-  if (!program || !customer) {
+  if (!program) {
     notFound()
   }
 

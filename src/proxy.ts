@@ -37,9 +37,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // En rutas del cliente (/c/*) no redirigimos: la página decide. El middleware
+  // corre solo para refrescar la sesión del cliente y mantenerla viva entre
+  // visitas (UX progresiva: no pedir OTP de nuevo).
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/login', '/registro', '/dashboard/:path*'],
+  matcher: ['/login', '/registro', '/dashboard/:path*', '/c/:path*'],
 }

@@ -1,5 +1,7 @@
-import { db } from '@/lib/drizzle/db'
-import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { db, withAuth } from '@/lib/drizzle/db'
+import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq, and } from 'drizzle-orm'
 import { PhoneForm } from './phone-form'
 
@@ -90,6 +92,25 @@ export default async function CustomerLandingPage({ params }: PageProps) {
         </div>
       </main>
     )
+  }
+
+  // Si el cliente ya verificó su número antes (sesión activa) y tiene tarjeta en
+  // este negocio, lo mandamos directo a su tarjeta — sin pedir OTP otra vez.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    const [existing] = await withAuth(user.id, (tx) =>
+      tx
+        .select({ cardId: loyaltyCards.id })
+        .from(loyaltyCards)
+        .innerJoin(customers, eq(customers.id, loyaltyCards.customerId))
+        .where(and(eq(loyaltyCards.tenantId, tenant.id), eq(customers.authUserId, user.id)))
+        .limit(1)
+    )
+    if (existing) redirect(`/c/${slug}/tarjeta/${existing.cardId}`)
   }
 
   const stampsToShow = Math.min(program.stampsRequired, 12)
