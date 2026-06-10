@@ -2,10 +2,35 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
 import { createProgramSchema } from '@/lib/validations/onboarding'
 import { eq } from 'drizzle-orm'
+
+const LOGO_BUCKET = 'logos'
+const ALLOWED_LOGO_TYPES: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+}
+const MAX_LOGO_BYTES = 2 * 1024 * 1024 // 2 MB
+
+/** Sube el logo al bucket público y devuelve la URL pública (o un error). */
+async function uploadLogo(tenantId: string, file: File): Promise<{ url: string } | { error: string }> {
+  const ext = ALLOWED_LOGO_TYPES[file.type]
+  if (!ext) return { error: 'El logo debe ser PNG, JPG o WEBP.' }
+  if (file.size > MAX_LOGO_BYTES) return { error: 'El logo no puede pesar más de 2 MB.' }
+
+  const admin = createAdminClient()
+  const path = `${tenantId}/${Date.now()}.${ext}`
+  const { error } = await admin.storage
+    .from(LOGO_BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: true })
+  if (error) return { error: 'No se pudo subir el logo. Intentá de nuevo.' }
+
+  return { url: admin.storage.from(LOGO_BUCKET).getPublicUrl(path).data.publicUrl }
+}
 
 export async function createProgram(formData: FormData) {
   const raw = {
@@ -27,14 +52,29 @@ export async function createProgram(formData: FormData) {
 
   if (!user) return { error: 'No autorizado' }
 
+  const [tenant] = await withAuth(user.id, (tx) =>
+    tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+  )
+  if (!tenant) return { error: 'Negocio no encontrado' }
+
+  // Logo opcional: se sube antes del upsert para guardar la URL en el mismo update.
+  let logoUrl: string | null = null
+  const logoFile = formData.get('logo')
+  if (logoFile instanceof File && logoFile.size > 0) {
+    const uploaded = await uploadLogo(tenant.id, logoFile)
+    if ('error' in uploaded) return { error: uploaded.error }
+    logoUrl = uploaded.url
+  }
+
   const outcome = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-
-    if (!tenant) return { error: 'Negocio no encontrado' as const }
-
-    if (result.data.businessName !== tenant.name) {
-      await tx.update(tenants).set({ name: result.data.businessName }).where(eq(tenants.id, tenant.id))
-    }
+    await tx
+      .update(tenants)
+      .set({
+        name: result.data.businessName,
+        ...(logoUrl ? { logoUrl } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(tenants.id, tenant.id))
 
     const [existing] = await tx
       .select()

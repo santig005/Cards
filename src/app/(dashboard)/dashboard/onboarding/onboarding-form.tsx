@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createProgram } from './actions'
@@ -13,6 +13,7 @@ interface ExistingProgram {
 
 interface OnboardingFormProps {
   defaultBusinessName: string
+  defaultLogoUrl?: string
   existingProgram?: ExistingProgram
 }
 
@@ -45,12 +46,19 @@ const REWARD_OPTIONS = [
 
 type RewardType = 'free_product' | 'discount_percent' | 'two_for_one' | 'custom'
 
-export function OnboardingForm({ defaultBusinessName, existingProgram }: OnboardingFormProps) {
+export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingProgram }: OnboardingFormProps) {
   const [selectedReward, setSelectedReward] = useState<RewardType>(
     (existingProgram?.rewardType as RewardType) ?? 'free_product'
   )
+  const [logoPreview, setLogoPreview] = useState<string | null>(defaultLogoUrl ?? null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) setLogoPreview(URL.createObjectURL(file))
+  }
 
   function handleSubmit(formData: FormData) {
     setError(null)
@@ -64,6 +72,40 @@ export function OnboardingForm({ defaultBusinessName, existingProgram }: Onboard
 
   return (
     <form action={handleSubmit} className="space-y-8">
+      {/* Logo */}
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-gray-700">Logo del negocio</p>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center overflow-hidden shrink-0">
+            {logoPreview ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={logoPreview} alt="Vista previa del logo" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-2xl text-amber-300">🏪</span>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => logoInputRef.current?.click()}
+            >
+              {logoPreview ? 'Cambiar logo' : 'Subir logo'}
+            </Button>
+            <span className="text-xs text-gray-400">PNG, JPG o WEBP · máx 2 MB · opcional</span>
+          </div>
+          <input
+            ref={logoInputRef}
+            type="file"
+            name="logo"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={handleLogoChange}
+            className="hidden"
+          />
+        </div>
+      </div>
+
       {/* Business name */}
       <div>
         <Input

@@ -82,6 +82,7 @@ export default async function OnboardingPage() {
         <Card padding="lg" className="shadow-xl shadow-amber-100/50 border-amber-100">
           <OnboardingForm
             defaultBusinessName={tenant.name}
+            defaultLogoUrl={tenant.logoUrl ?? undefined}
             existingProgram={existingProgram ?? undefined}
           />
         </Card>
