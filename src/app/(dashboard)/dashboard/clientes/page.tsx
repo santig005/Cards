@@ -56,6 +56,7 @@ export default async function ClientesPage() {
         phone: customers.phone,
         name: customers.name,
         email: customers.email,
+        createdAt: customers.createdAt,
         cardId: loyaltyCards.id,
         currentStamps: loyaltyCards.currentStamps,
         totalRedeemed: loyaltyCards.totalRedeemed,
