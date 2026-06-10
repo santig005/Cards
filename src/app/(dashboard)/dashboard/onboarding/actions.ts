@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/drizzle/db'
+import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
 import { createProgramSchema } from '@/lib/validations/onboarding'
 import { eq } from 'drizzle-orm'
@@ -27,35 +27,46 @@ export async function createProgram(formData: FormData) {
 
   if (!user) return { error: 'No autorizado' }
 
-  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+  const outcome = await withAuth(user.id, async (tx) => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
 
-  if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: 'Negocio no encontrado' as const }
 
-  if (result.data.businessName !== tenant.name) {
-    await db.update(tenants).set({ name: result.data.businessName }).where(eq(tenants.id, tenant.id))
-  }
+    if (result.data.businessName !== tenant.name) {
+      await tx.update(tenants).set({ name: result.data.businessName }).where(eq(tenants.id, tenant.id))
+    }
 
-  const [existing] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant.id)).limit(1)
+    const [existing] = await tx
+      .select()
+      .from(loyaltyPrograms)
+      .where(eq(loyaltyPrograms.tenantId, tenant.id))
+      .limit(1)
 
-  if (existing) {
-    await db
-      .update(loyaltyPrograms)
-      .set({
+    if (existing) {
+      await tx
+        .update(loyaltyPrograms)
+        .set({
+          stampsRequired: result.data.stampsRequired,
+          rewardType: result.data.rewardType,
+          rewardDescription: result.data.rewardDescription,
+          updatedAt: new Date(),
+        })
+        .where(eq(loyaltyPrograms.id, existing.id))
+    } else {
+      await tx.insert(loyaltyPrograms).values({
+        tenantId: tenant.id,
         stampsRequired: result.data.stampsRequired,
         rewardType: result.data.rewardType,
         rewardDescription: result.data.rewardDescription,
-        updatedAt: new Date(),
+        isActive: true,
       })
-      .where(eq(loyaltyPrograms.id, existing.id))
-  } else {
-    await db.insert(loyaltyPrograms).values({
-      tenantId: tenant.id,
-      stampsRequired: result.data.stampsRequired,
-      rewardType: result.data.rewardType,
-      rewardDescription: result.data.rewardDescription,
-      isActive: true,
-    })
-  }
+    }
+
+    return { error: null }
+  })
+
+  // redirect() throws, so it must run outside the transaction callback.
+  if (outcome.error) return { error: outcome.error }
 
   redirect('/dashboard')
 }

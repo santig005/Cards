@@ -1,9 +1,9 @@
 ﻿import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/drizzle/db'
+import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
-import { eq, count } from 'drizzle-orm'
+import { eq, and, count } from 'drizzle-orm'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,37 +14,47 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
-  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user!.id)).limit(1)
+  const data = await withAuth(user.id, async (tx) => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    if (!tenant) return null
 
-  if (!tenant) redirect('/login')
+    const [program] = await tx
+      .select()
+      .from(loyaltyPrograms)
+      .where(eq(loyaltyPrograms.tenantId, tenant.id))
+      .limit(1)
 
-  const [program] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant!.id)).limit(1)
+    let customerCount = 0
+    let stampCount = 0
+    let redeemCount = 0
 
-  let customerCount = 0
-  let stampCount = 0
-  let redeemCount = 0
+    if (program) {
+      const [customerResult] = await tx
+        .select({ value: count() })
+        .from(customers)
+        .where(eq(customers.tenantId, tenant.id))
 
-  if (program) {
-    const [customerResult] = await db
-      .select({ value: count() })
-      .from(customers)
-      .where(eq(customers.tenantId, tenant!.id))
+      const [stampResult] = await tx
+        .select({ value: count() })
+        .from(stampEvents)
+        .where(and(eq(stampEvents.tenantId, tenant.id), eq(stampEvents.eventType, 'stamp')))
 
-    const [stampResult] = await db
-      .select({ value: count() })
-      .from(stampEvents)
-      .where(eq(stampEvents.tenantId, tenant!.id))
+      customerCount = customerResult?.value ?? 0
+      stampCount = stampResult?.value ?? 0
 
-    customerCount = customerResult?.value ?? 0
-    stampCount = stampResult?.value ?? 0
+      const cards = await tx
+        .select({ totalRedeemed: loyaltyCards.totalRedeemed })
+        .from(loyaltyCards)
+        .where(eq(loyaltyCards.tenantId, tenant.id))
 
-    const cards = await db
-      .select({ totalRedeemed: loyaltyCards.totalRedeemed })
-      .from(loyaltyCards)
-      .where(eq(loyaltyCards.tenantId, tenant!.id))
+      redeemCount = cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0)
+    }
 
-    redeemCount = cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0)
-  }
+    return { tenant, program: program ?? null, customerCount, stampCount, redeemCount }
+  })
+
+  if (!data) redirect('/login')
+  const { tenant, program, customerCount, stampCount, redeemCount } = data
 
   const REWARD_LABELS: Record<string, string> = {
     free_product: '🎁 Producto gratis',

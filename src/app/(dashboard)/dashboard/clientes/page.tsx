@@ -1,7 +1,7 @@
 ﻿import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/drizzle/db'
+import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { Card } from '@/components/ui/card'
@@ -14,11 +14,19 @@ export default async function ClientesPage() {
 
   if (!user) redirect('/login')
 
-  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user!.id)).limit(1)
+  const base = await withAuth(user.id, async (tx) => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    if (!tenant) return null
+    const [program] = await tx
+      .select()
+      .from(loyaltyPrograms)
+      .where(eq(loyaltyPrograms.tenantId, tenant.id))
+      .limit(1)
+    return { tenant, program: program ?? null }
+  })
 
-  if (!tenant) redirect('/login')
-
-  const [program] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant!.id)).limit(1)
+  if (!base) redirect('/login')
+  const { tenant, program } = base
 
   if (!program) {
     return (
@@ -41,19 +49,21 @@ export default async function ClientesPage() {
     )
   }
 
-  const customerList = await db
-    .select({
-      customerId: customers.id,
-      phone: customers.phone,
-      name: customers.name,
-      email: customers.email,
-      cardId: loyaltyCards.id,
-      currentStamps: loyaltyCards.currentStamps,
-      totalRedeemed: loyaltyCards.totalRedeemed,
-    })
-    .from(customers)
-    .leftJoin(loyaltyCards, eq(loyaltyCards.customerId, customers.id))
-    .where(eq(customers.tenantId, tenant!.id))
+  const customerList = await withAuth(user.id, (tx) =>
+    tx
+      .select({
+        customerId: customers.id,
+        phone: customers.phone,
+        name: customers.name,
+        email: customers.email,
+        cardId: loyaltyCards.id,
+        currentStamps: loyaltyCards.currentStamps,
+        totalRedeemed: loyaltyCards.totalRedeemed,
+      })
+      .from(customers)
+      .leftJoin(loyaltyCards, eq(loyaltyCards.customerId, customers.id))
+      .where(eq(customers.tenantId, tenant.id))
+  )
 
   return (
     <div className="space-y-6">

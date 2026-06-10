@@ -35,8 +35,9 @@ yarn-error.log*
 .env.local
 .env.*.local
 
-# drizzle
-/supabase/migrations
+# drizzle — los snapshots/journal generados se ignoran, pero las migraciones SQL
+# (incluidas las de RLS escritas a mano) SÍ se versionan.
+/supabase/migrations/meta
 
 # vercel
 .vercel

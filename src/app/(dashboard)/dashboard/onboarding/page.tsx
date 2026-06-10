@@ -1,6 +1,6 @@
 ﻿import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/drizzle/db'
+import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { Card } from '@/components/ui/card'
@@ -14,11 +14,19 @@ export default async function OnboardingPage() {
 
   if (!user) redirect('/login')
 
-  const [tenant] = await db.select().from(tenants).where(eq(tenants.ownerId, user!.id)).limit(1)
+  const result = await withAuth(user.id, async (tx) => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    if (!tenant) return null
+    const [existingProgram] = await tx
+      .select()
+      .from(loyaltyPrograms)
+      .where(eq(loyaltyPrograms.tenantId, tenant.id))
+      .limit(1)
+    return { tenant, existingProgram: existingProgram ?? null }
+  })
 
-  if (!tenant) redirect('/login')
-
-  const [existingProgram] = await db.select().from(loyaltyPrograms).where(eq(loyaltyPrograms.tenantId, tenant!.id)).limit(1)
+  if (!result) redirect('/login')
+  const { tenant, existingProgram } = result
 
   const isEditing = !!existingProgram
 

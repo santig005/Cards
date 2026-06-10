@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/drizzle/db'
+import { withAuth } from '@/lib/drizzle/db'
 import { tenants } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { SidebarNav } from '@/components/features/sidebar-nav'
@@ -14,9 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   if (!user) redirect('/login')
 
-  const [tenant] = user
-    ? await db.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    : []
+  const [tenant] = await withAuth(user.id, (tx) =>
+    tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+  )
 
   return (
     <div className="min-h-screen bg-[#fafafe] flex">
