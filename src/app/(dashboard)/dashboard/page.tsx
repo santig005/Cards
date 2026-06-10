@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
-import { eq, and, count } from 'drizzle-orm'
+import { eq, and, count, gte, sql } from 'drizzle-orm'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,11 @@ export default async function DashboardPage() {
     let customerCount = 0
     let stampCount = 0
     let redeemCount = 0
+    let analytics: {
+      byDay: { label: string; count: number }[]
+      newCustomers7d: number
+      returningCount: number
+    } | null = null
 
     if (program) {
       const [customerResult] = await tx
@@ -48,13 +53,63 @@ export default async function DashboardPage() {
         .where(eq(loyaltyCards.tenantId, tenant.id))
 
       redeemCount = cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0)
+
+      // ── Analytics: ventana de los últimos 7 días (en UTC, para coincidir con
+      // el to_char del agrupado) ──
+      const since = new Date()
+      since.setUTCHours(0, 0, 0, 0)
+      since.setUTCDate(since.getUTCDate() - 6)
+
+      const rawByDay = await tx
+        .select({
+          day: sql<string>`to_char(${stampEvents.createdAt}, 'YYYY-MM-DD')`,
+          value: count(),
+        })
+        .from(stampEvents)
+        .where(
+          and(
+            eq(stampEvents.tenantId, tenant.id),
+            eq(stampEvents.eventType, 'stamp'),
+            gte(stampEvents.createdAt, since)
+          )
+        )
+        .groupBy(sql`to_char(${stampEvents.createdAt}, 'YYYY-MM-DD')`)
+
+      const [newCustomersResult] = await tx
+        .select({ value: count() })
+        .from(customers)
+        .where(and(eq(customers.tenantId, tenant.id), gte(customers.createdAt, since)))
+
+      // Clientes recurrentes = con más de un sello registrado.
+      const perCustomer = await tx
+        .select({ customerId: stampEvents.customerId, value: count() })
+        .from(stampEvents)
+        .where(and(eq(stampEvents.tenantId, tenant.id), eq(stampEvents.eventType, 'stamp')))
+        .groupBy(stampEvents.customerId)
+      const returningCount = perCustomer.filter((r) => Number(r.value) > 1).length
+
+      const dayMap = new Map(rawByDay.map((r) => [r.day, Number(r.value)]))
+      const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+      const byDay: { label: string; count: number }[] = []
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date()
+        d.setUTCHours(0, 0, 0, 0)
+        d.setUTCDate(d.getUTCDate() - i)
+        const key = d.toISOString().slice(0, 10)
+        byDay.push({ label: labels[d.getUTCDay()], count: dayMap.get(key) ?? 0 })
+      }
+
+      analytics = { byDay, newCustomers7d: newCustomersResult?.value ?? 0, returningCount }
     }
 
-    return { tenant, program: program ?? null, customerCount, stampCount, redeemCount }
+    return { tenant, program: program ?? null, customerCount, stampCount, redeemCount, analytics }
   })
 
   if (!data) redirect('/login')
-  const { tenant, program, customerCount, stampCount, redeemCount } = data
+  const { tenant, program, customerCount, stampCount, redeemCount, analytics } = data
+
+  const weekTotal = analytics?.byDay.reduce((s, d) => s + d.count, 0) ?? 0
+  const maxDay = analytics ? Math.max(1, ...analytics.byDay.map((d) => d.count)) : 1
 
   const REWARD_LABELS: Record<string, string> = {
     free_product: '🎁 Producto gratis',
@@ -178,6 +233,48 @@ export default async function DashboardPage() {
               </Button>
             </Link>
           </div>
+
+          {analytics && (
+            <Card padding="md" className="border-amber-100">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Actividad</p>
+                  <p className="font-semibold text-gray-800">Sellos últimos 7 días</p>
+                </div>
+                <span className="text-sm font-medium text-amber-700">{weekTotal} esta semana</span>
+              </div>
+
+              <div className="flex items-end justify-between gap-2 h-28">
+                {analytics.byDay.map((d, i) => {
+                  const pct = Math.round((d.count / maxDay) * 100)
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full">
+                      <div className="w-full flex items-end justify-center flex-1">
+                        <div
+                          className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-amber-400 to-amber-500 transition-all duration-300"
+                          style={{ height: `${d.count > 0 ? Math.max(pct, 8) : 3}%` }}
+                          title={`${d.count} ${d.count === 1 ? 'sello' : 'sellos'}`}
+                        />
+                      </div>
+                      <span className="text-[10px] text-gray-400 tabular-nums">{d.count}</span>
+                      <span className="text-[10px] text-gray-400">{d.label}</span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-5">
+                <div className="rounded-xl bg-stone-50 p-3">
+                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.newCustomers7d}</p>
+                  <p className="text-xs text-gray-500">Clientes nuevos (7d)</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 p-3">
+                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.returningCount}</p>
+                  <p className="text-xs text-gray-500">Clientes recurrentes</p>
+                </div>
+              </div>
+            </Card>
+          )}
         </>
       )}
     </div>
