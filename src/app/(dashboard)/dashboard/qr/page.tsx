@@ -79,6 +79,12 @@ export default async function QRPage() {
           </div>
         </div>
 
+        <Link href="/dashboard/qr/poster" className="block mt-4">
+          <Button size="lg" className="w-full gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
+            🖨️ Generar afiche imprimible
+          </Button>
+        </Link>
+
         <div className="mt-4 text-center">
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">← Volver al dashboard</Button>
