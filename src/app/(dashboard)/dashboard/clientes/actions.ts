@@ -1,9 +1,10 @@
 'use server'
 
+import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
-import { tenants, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
+import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
 import { applyStamp, canRedeem, isWithinCooldown } from '@/lib/loyalty'
 
@@ -166,6 +167,84 @@ export async function undoLastStamp(cardId: string): Promise<UndoResult> {
       .where(eq(loyaltyCards.id, cardId))
 
     return { success: true, stamps: card.currentStamps - 1 }
+  })
+
+  if ('success' in result) revalidate()
+  return result
+}
+
+// ─── Gestión de clientes ──────────────────────────────────────────────────────
+
+const updateCustomerSchema = z.object({
+  name: z.string().trim().max(80, 'Máximo 80 caracteres').optional(),
+  email: z.union([z.string().trim().email('Email inválido'), z.literal('')]).optional(),
+})
+
+type UpdateCustomerResult = { error: string } | { success: true }
+
+/** Edita el nombre/email de un cliente del negocio. */
+export async function updateCustomer(
+  customerId: string,
+  input: { name?: string; email?: string }
+): Promise<UpdateCustomerResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autorizado' }
+
+  const parsed = updateCustomerSchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
+  }
+
+  const result = await withAuth(user.id, async (tx): Promise<UpdateCustomerResult> => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    if (!tenant) return { error: 'Negocio no encontrado' }
+
+    const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
+    // RLS ya aísla por tenant; este check es defensa en profundidad.
+    if (!customer || customer.tenantId !== tenant.id) return { error: 'Cliente no encontrado' }
+
+    await tx
+      .update(customers)
+      .set({
+        name: parsed.data.name ? parsed.data.name : null,
+        email: parsed.data.email ? parsed.data.email : null,
+      })
+      .where(eq(customers.id, customerId))
+
+    return { success: true }
+  })
+
+  if ('success' in result) revalidate()
+  return result
+}
+
+type DeleteCustomerResult = { error: string } | { success: true }
+
+/** Elimina un cliente del negocio junto con sus tarjetas y eventos. */
+export async function deleteCustomer(customerId: string): Promise<DeleteCustomerResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autorizado' }
+
+  const result = await withAuth(user.id, async (tx): Promise<DeleteCustomerResult> => {
+    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
+    if (!tenant) return { error: 'Negocio no encontrado' }
+
+    const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
+    if (!customer || customer.tenantId !== tenant.id) return { error: 'Cliente no encontrado' }
+
+    // No hay FKs con cascade en el schema → borramos en orden manualmente,
+    // siempre acotado por tenant (defensa en profundidad sobre RLS).
+    await tx
+      .delete(stampEvents)
+      .where(and(eq(stampEvents.tenantId, tenant.id), eq(stampEvents.customerId, customerId)))
+    await tx
+      .delete(loyaltyCards)
+      .where(and(eq(loyaltyCards.tenantId, tenant.id), eq(loyaltyCards.customerId, customerId)))
+    await tx.delete(customers).where(eq(customers.id, customerId))
+
+    return { success: true }
   })
 
   if ('success' in result) revalidate()
