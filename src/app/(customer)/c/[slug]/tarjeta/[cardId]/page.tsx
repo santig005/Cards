@@ -5,6 +5,7 @@ import { db, withAuth } from '@/lib/drizzle/db'
 import { loyaltyCards, tenants, loyaltyPrograms, customers } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
+import { logoutCustomer } from '../../actions'
 
 interface PageProps {
   params: Promise<{ slug: string; cardId: string }>
@@ -214,13 +215,18 @@ export default async function CardPage({ params }: PageProps) {
                 )}
               </div>
               <div
-                className={`w-12 h-12 rounded-2xl backdrop-blur-sm flex items-center justify-center text-xl font-bold shrink-0 ${
+                className={`w-12 h-12 rounded-2xl backdrop-blur-sm flex items-center justify-center text-xl font-bold shrink-0 overflow-hidden ${
                   isRedeemable
                     ? 'bg-white/15 text-white'
                     : 'bg-stone-950/20 text-stone-950'
                 }`}
               >
-                {tenant.name.charAt(0).toUpperCase()}
+                {tenant.logoUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={tenant.logoUrl} alt={`Logo de ${tenant.name}`} className="w-full h-full object-cover" />
+                ) : (
+                  tenant.name.charAt(0).toUpperCase()
+                )}
               </div>
             </div>
 
@@ -321,7 +327,15 @@ export default async function CardPage({ params }: PageProps) {
       </p>
 
       {/* Footer */}
-      <footer className="pb-2 text-center">
+      <footer className="pb-2 text-center space-y-2">
+        <form action={logoutCustomer.bind(null, slug)}>
+          <button
+            type="submit"
+            className="text-xs text-stone-500 hover:text-amber-400 underline underline-offset-2 transition-colors"
+          >
+            ¿No sos vos? Cerrar sesión
+          </button>
+        </form>
         <p className="text-xs text-stone-600">
           Powered by <span className="text-amber-500 font-medium">Sellio</span>
         </p>

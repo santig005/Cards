@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
@@ -141,4 +142,11 @@ export async function verifyOtp(
   } catch {
     return { error: 'Ocurrió un error inesperado. Intentá de nuevo.' }
   }
+}
+
+/** Cierra la sesión del cliente y vuelve al landing del negocio. */
+export async function logoutCustomer(slug: string) {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect(`/c/${slug}`)
 }
