@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { requestOtp, verifyOtp } from './actions'
@@ -14,6 +15,7 @@ type Step = 'phone' | 'code'
 
 export function PhoneForm({ slug }: PhoneFormProps) {
   const router = useRouter()
+  const t = useTranslations('customer.form')
   const [step, setStep] = useState<Step>('phone')
   const [phone, setPhone] = useState('')
   const [sentTo, setSentTo] = useState('') // teléfono normalizado (E.164) del paso 1
@@ -34,7 +36,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
       setSentTo(result.phone)
       setStep('code')
     } catch {
-      setError('Ocurrió un error inesperado. Intentá de nuevo.')
+      setError(t('errorGeneric'))
     } finally {
       setLoading(false)
     }
@@ -52,7 +54,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
       }
       router.push(`/c/${slug}/tarjeta/${result.cardId}`)
     } catch {
-      setError('Ocurrió un error inesperado. Intentá de nuevo.')
+      setError(t('errorGeneric'))
     } finally {
       setLoading(false)
     }
@@ -67,18 +69,15 @@ export function PhoneForm({ slug }: PhoneFormProps) {
   if (step === 'code') {
     return (
       <form onSubmit={handleVerify} className="flex flex-col gap-4">
-        <div className="text-sm text-gray-600">
-          Te enviamos un código por WhatsApp a{' '}
-          <span className="font-semibold text-gray-900">{sentTo}</span>.
-        </div>
+        <p className="text-sm text-gray-600">{t('sentTo', { phone: sentTo })}</p>
         <Input
           type="text"
-          label="Código de verificación"
+          label={t('codeLabel')}
           placeholder="123456"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           error={error}
-          hint="Revisá tu WhatsApp e ingresá el código de 6 dígitos"
+          hint={t('codeHint')}
           disabled={loading}
           autoComplete="one-time-code"
           inputMode="numeric"
@@ -93,7 +92,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
           disabled={code.replace(/\D/g, '').length < 4}
           className="w-full"
         >
-          {loading ? 'Verificando...' : 'Ver mi tarjeta'}
+          {loading ? t('verifying') : t('verify')}
         </Button>
         <button
           type="button"
@@ -101,7 +100,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
           disabled={loading}
           className="text-center text-xs text-gray-400 hover:text-amber-600 transition-colors disabled:opacity-50"
         >
-          ← Usar otro número
+          ← {t('changeNumber')}
         </button>
       </form>
     )
@@ -111,12 +110,12 @@ export function PhoneForm({ slug }: PhoneFormProps) {
     <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
       <Input
         type="tel"
-        label="Tu número de celular"
+        label={t('phoneLabel')}
         placeholder="+57 300 123 4567"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         error={error}
-        hint="Te enviaremos un código por WhatsApp para identificarte"
+        hint={t('phoneHint')}
         disabled={loading}
         autoComplete="tel"
         inputMode="tel"
@@ -130,12 +129,9 @@ export function PhoneForm({ slug }: PhoneFormProps) {
         disabled={phone.trim().length < 7}
         className="w-full"
       >
-        {loading ? 'Enviando código...' : 'Continuar con WhatsApp'}
+        {loading ? t('sending') : t('continue')}
       </Button>
-      <p className="text-center text-xs text-gray-400 pt-1 leading-relaxed">
-        Al continuar aceptás el tratamiento de tu número según la Ley 1581 de 2012
-        (Habeas Data). No compartimos tu información con terceros.
-      </p>
+      <p className="text-center text-xs text-gray-400 pt-1 leading-relaxed">{t('habeas')}</p>
     </form>
   )
 }

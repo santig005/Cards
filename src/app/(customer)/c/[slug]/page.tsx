@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { db, withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq, and } from 'drizzle-orm'
 import { PhoneForm } from './phone-form'
+import { LocaleSwitcher } from '@/components/features/locale-switcher'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -52,6 +54,7 @@ function StampPreview({ count }: { count: number }) {
 
 export default async function CustomerLandingPage({ params }: PageProps) {
   const { slug } = await params
+  const t = await getTranslations('customer')
 
   // Fetch tenant and active program in parallel
   const [tenant] = await db
@@ -65,10 +68,8 @@ export default async function CustomerLandingPage({ params }: PageProps) {
       <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex items-center justify-center p-4">
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">🔍</div>
-          <h1 className="text-2xl font-bold text-white">Negocio no encontrado</h1>
-          <p className="text-white/50">
-            El enlace que visitaste no corresponde a ningún negocio registrado en Sellio.
-          </p>
+          <h1 className="text-2xl font-bold text-white">{t('notFoundTitle')}</h1>
+          <p className="text-white/50">{t('notFoundBody')}</p>
         </div>
       </main>
     )
@@ -86,9 +87,7 @@ export default async function CustomerLandingPage({ params }: PageProps) {
         <div className="max-w-sm w-full text-center space-y-4">
           <div className="text-6xl">😴</div>
           <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
-          <p className="text-white/50">
-            Este negocio no tiene un programa de fidelización activo por el momento.
-          </p>
+          <p className="text-white/50">{t('inactiveBody')}</p>
         </div>
       </main>
     )
@@ -151,33 +150,31 @@ export default async function CustomerLandingPage({ params }: PageProps) {
                 </div>
               )}
               <h1 className="text-2xl font-bold text-stone-950">{tenant.name}</h1>
-              <p className="text-stone-900/70 text-sm mt-1">Programa de fidelización</p>
+              <p className="text-stone-900/70 text-sm mt-1">{t('tagline')}</p>
             </div>
 
             {/* Reward info */}
             <div className="bg-stone-950/20 backdrop-blur-sm rounded-2xl p-4 text-left border border-stone-950/10">
               <p className="text-stone-950/80 text-xs uppercase tracking-wider font-medium mb-1">
-                Recompensa
+                {t('rewardLabel')}
               </p>
               <p className="text-stone-950 font-semibold text-base leading-snug">
                 {program.rewardDescription}
               </p>
               <p className="text-stone-950/80 text-sm mt-2">
-                Acumulá{' '}
-                <span className="text-stone-950/60 font-bold">{program.stampsRequired} sellos</span> y
-                reclamá tu premio
+                {t('accumulate', { count: program.stampsRequired })}
               </p>
             </div>
 
             {/* Stamp preview */}
             <div className="space-y-2">
               <p className="text-stone-950/60 text-xs text-center uppercase tracking-wider">
-                Vista previa
+                {t('preview')}
               </p>
               <StampPreview count={stampsToShow} />
               {program.stampsRequired > 12 && (
                 <p className="text-stone-950/60 text-xs text-center">
-                  +{program.stampsRequired - 12} más
+                  {t('more', { count: program.stampsRequired - 12 })}
                 </p>
               )}
             </div>
@@ -189,10 +186,8 @@ export default async function CustomerLandingPage({ params }: PageProps) {
       <div className="w-full max-w-sm py-4">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 space-y-5 border border-white/20">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">¿Ya sos cliente?</h2>
-            <p className="text-gray-500 text-sm">
-              Ingresá tu número para ver tu tarjeta de sellos.
-            </p>
+            <h2 className="text-xl font-bold text-gray-900">{t('cardTitle')}</h2>
+            <p className="text-gray-500 text-sm">{t('cardSubtitle')}</p>
           </div>
 
           <PhoneForm slug={slug} />
@@ -200,10 +195,10 @@ export default async function CustomerLandingPage({ params }: PageProps) {
       </div>
 
       {/* Footer */}
-      <footer className="pb-6 text-center">
+      <footer className="pb-6 flex flex-col items-center gap-3">
+        <LocaleSwitcher />
         <p className="text-xs text-stone-500">
-          Powered by{' '}
-          <span className="text-amber-500 font-medium">Sellio</span>
+          {t('poweredBy')} <span className="text-amber-500 font-medium">Sellio</span>
         </p>
       </footer>
     </main>

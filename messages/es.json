@@ -1,0 +1,32 @@
+{
+  "common": {
+    "language": "Idioma"
+  },
+  "customer": {
+    "notFoundTitle": "Negocio no encontrado",
+    "notFoundBody": "El enlace que visitaste no corresponde a ningún negocio registrado en Sellio.",
+    "inactiveBody": "Este negocio no tiene un programa de fidelización activo por el momento.",
+    "tagline": "Programa de fidelización",
+    "rewardLabel": "Recompensa",
+    "accumulate": "Acumulá {count} sellos y reclamá tu premio",
+    "preview": "Vista previa",
+    "more": "+{count} más",
+    "cardTitle": "¿Ya sos cliente?",
+    "cardSubtitle": "Ingresá tu número para ver tu tarjeta de sellos.",
+    "poweredBy": "Powered by",
+    "form": {
+      "phoneLabel": "Tu número de celular",
+      "phoneHint": "Te enviaremos un código por WhatsApp para identificarte",
+      "continue": "Continuar con WhatsApp",
+      "sending": "Enviando código...",
+      "habeas": "Al continuar aceptás el tratamiento de tu número según la Ley 1581 de 2012 (Habeas Data). No compartimos tu información con terceros.",
+      "codeLabel": "Código de verificación",
+      "codeHint": "Revisá tu WhatsApp e ingresá el código de 6 dígitos",
+      "verify": "Ver mi tarjeta",
+      "verifying": "Verificando...",
+      "sentTo": "Te enviamos un código por WhatsApp a {phone}.",
+      "changeNumber": "Usar otro número",
+      "errorGeneric": "Ocurrió un error inesperado. Intentá de nuevo."
+    }
+  }
+}
