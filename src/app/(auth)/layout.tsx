@@ -43,7 +43,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Testimonial card */}
           <div className="rounded-2xl bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 p-5 space-y-3">
             <p className="text-stone-100/90 text-sm leading-relaxed">
-              "Aumenté la retención un 40% en los primeros dos meses. La experiencia del cliente es increíble."
+              &ldquo;Aumenté la retención un 40% en los primeros dos meses. La experiencia del cliente es increíble.&rdquo;
             </p>
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300 text-xs font-bold shrink-0">
