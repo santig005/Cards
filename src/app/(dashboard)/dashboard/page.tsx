@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq, and, count, gte, sql } from 'drizzle-orm'
+import { buildLast7Days } from '@/lib/analytics'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,7 @@ export default async function DashboardPage() {
       byDay: { label: string; count: number }[]
       newCustomers7d: number
       returningCount: number
+      redemptionRate: number
     } | null = null
 
     if (program) {
@@ -54,15 +56,22 @@ export default async function DashboardPage() {
 
       redeemCount = cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0)
 
-      // ── Analytics: ventana de los últimos 7 días (en UTC, para coincidir con
-      // el to_char del agrupado) ──
-      const since = new Date()
-      since.setUTCHours(0, 0, 0, 0)
-      since.setUTCDate(since.getUTCDate() - 6)
+      // Tasa de canje: % de clientes que ya canjearon al menos un premio.
+      const redeemedCustomers = cards.filter((c) => (c.totalRedeemed ?? 0) > 0).length
+      const redemptionRate = customerCount > 0 ? Math.round((redeemedCustomers / customerCount) * 100) : 0
+
+      // ── Analytics: últimos 7 días en hora local de Colombia ──
+      const TZ = 'America/Bogota'
+      const now = new Date()
+      const nowMs = now.getTime()
+      // Ventana amplia (8 días) para no perder el primer día por el offset horario;
+      // el bucketing exacto lo hace el to_char en zona local + el mapeo por clave.
+      const since = new Date(nowMs - 8 * 24 * 60 * 60 * 1000)
+      const since7 = new Date(nowMs - 7 * 24 * 60 * 60 * 1000)
 
       const rawByDay = await tx
         .select({
-          day: sql<string>`to_char(${stampEvents.createdAt}, 'YYYY-MM-DD')`,
+          day: sql<string>`to_char((${stampEvents.createdAt} at time zone 'UTC') at time zone ${TZ}, 'YYYY-MM-DD')`,
           value: count(),
         })
         .from(stampEvents)
@@ -73,12 +82,12 @@ export default async function DashboardPage() {
             gte(stampEvents.createdAt, since)
           )
         )
-        .groupBy(sql`to_char(${stampEvents.createdAt}, 'YYYY-MM-DD')`)
+        .groupBy(sql`1`)
 
       const [newCustomersResult] = await tx
         .select({ value: count() })
         .from(customers)
-        .where(and(eq(customers.tenantId, tenant.id), gte(customers.createdAt, since)))
+        .where(and(eq(customers.tenantId, tenant.id), gte(customers.createdAt, since7)))
 
       // Clientes recurrentes = con más de un sello registrado.
       const perCustomer = await tx
@@ -89,17 +98,14 @@ export default async function DashboardPage() {
       const returningCount = perCustomer.filter((r) => Number(r.value) > 1).length
 
       const dayMap = new Map(rawByDay.map((r) => [r.day, Number(r.value)]))
-      const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
-      const byDay: { label: string; count: number }[] = []
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date()
-        d.setUTCHours(0, 0, 0, 0)
-        d.setUTCDate(d.getUTCDate() - i)
-        const key = d.toISOString().slice(0, 10)
-        byDay.push({ label: labels[d.getUTCDay()], count: dayMap.get(key) ?? 0 })
-      }
+      const byDay = buildLast7Days(now, dayMap, TZ)
 
-      analytics = { byDay, newCustomers7d: newCustomersResult?.value ?? 0, returningCount }
+      analytics = {
+        byDay,
+        newCustomers7d: newCustomersResult?.value ?? 0,
+        returningCount,
+        redemptionRate,
+      }
     }
 
     return { tenant, program: program ?? null, customerCount, stampCount, redeemCount, analytics }
@@ -263,7 +269,7 @@ export default async function DashboardPage() {
                 })}
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-5">
+              <div className="grid grid-cols-3 gap-3 mt-5">
                 <div className="rounded-xl bg-stone-50 p-3">
                   <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.newCustomers7d}</p>
                   <p className="text-xs text-gray-500">Clientes nuevos (7d)</p>
@@ -271,6 +277,10 @@ export default async function DashboardPage() {
                 <div className="rounded-xl bg-stone-50 p-3">
                   <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.returningCount}</p>
                   <p className="text-xs text-gray-500">Clientes recurrentes</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 p-3">
+                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.redemptionRate}%</p>
+                  <p className="text-xs text-gray-500">Tasa de canje</p>
                 </div>
               </div>
             </Card>
