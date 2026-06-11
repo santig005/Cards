@@ -1,10 +1,9 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
-import { tenants, loyaltyPrograms, customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
+import { customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq, and, count, gte, sql } from 'drizzle-orm'
+import { requireTenant } from '@/lib/tenant'
 import { buildLast7Days } from '@/lib/analytics'
 import { Users, Award, Gift, QrCode, Rocket, Pencil } from 'lucide-react'
 import { Card } from '@/components/ui/card'
@@ -12,34 +11,21 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
+  const { user, tenant, program } = await requireTenant()
   const t = await getTranslations('dashboard')
 
-  const data = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return null
+  let customerCount = 0
+  let stampCount = 0
+  let redeemCount = 0
+  let analytics: {
+    byDay: { label: string; count: number }[]
+    newCustomers7d: number
+    returningCount: number
+    redemptionRate: number
+  } | null = null
 
-    const [program] = await tx
-      .select()
-      .from(loyaltyPrograms)
-      .where(eq(loyaltyPrograms.tenantId, tenant.id))
-      .limit(1)
-
-    let customerCount = 0
-    let stampCount = 0
-    let redeemCount = 0
-    let analytics: {
-      byDay: { label: string; count: number }[]
-      newCustomers7d: number
-      returningCount: number
-      redemptionRate: number
-    } | null = null
-
-    if (program) {
+  if (program) {
+    const stats = await withAuth(user.id, async (tx) => {
       const [customerResult] = await tx
         .select({ value: count() })
         .from(customers)
@@ -50,28 +36,19 @@ export default async function DashboardPage() {
         .from(stampEvents)
         .where(and(eq(stampEvents.tenantId, tenant.id), eq(stampEvents.eventType, 'stamp')))
 
-      customerCount = customerResult?.value ?? 0
-      stampCount = stampResult?.value ?? 0
-
       const cards = await tx
         .select({ totalRedeemed: loyaltyCards.totalRedeemed })
         .from(loyaltyCards)
         .where(eq(loyaltyCards.tenantId, tenant.id))
 
-      redeemCount = cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0)
-
-      // Tasa de canje: % de clientes que ya canjearon al menos un premio.
       const redeemedCustomers = cards.filter((c) => (c.totalRedeemed ?? 0) > 0).length
-      const redemptionRate = customerCount > 0 ? Math.round((redeemedCustomers / customerCount) * 100) : 0
+      const total = customerResult?.value ?? 0
+      const redemptionRate = total > 0 ? Math.round((redeemedCustomers / total) * 100) : 0
 
-      // ── Analytics: últimos 7 días en hora local de Colombia ──
       const TZ = 'America/Bogota'
       const now = new Date()
-      const nowMs = now.getTime()
-      // Ventana amplia (8 días) para no perder el primer día por el offset horario;
-      // el bucketing exacto lo hace el to_char en zona local + el mapeo por clave.
-      const since = new Date(nowMs - 8 * 24 * 60 * 60 * 1000)
-      const since7 = new Date(nowMs - 7 * 24 * 60 * 60 * 1000)
+      const since = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000)
+      const since7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
 
       const rawByDay = await tx
         .select({
@@ -93,30 +70,32 @@ export default async function DashboardPage() {
         .from(customers)
         .where(and(eq(customers.tenantId, tenant.id), gte(customers.createdAt, since7)))
 
-      // Clientes recurrentes = con más de un sello registrado.
       const perCustomer = await tx
         .select({ customerId: stampEvents.customerId, value: count() })
         .from(stampEvents)
         .where(and(eq(stampEvents.tenantId, tenant.id), eq(stampEvents.eventType, 'stamp')))
         .groupBy(stampEvents.customerId)
-      const returningCount = perCustomer.filter((r) => Number(r.value) > 1).length
 
       const dayMap = new Map(rawByDay.map((r) => [r.day, Number(r.value)]))
-      const byDay = buildLast7Days(now, dayMap, TZ)
 
-      analytics = {
-        byDay,
-        newCustomers7d: newCustomersResult?.value ?? 0,
-        returningCount,
-        redemptionRate,
+      return {
+        customerCount: total,
+        stampCount: stampResult?.value ?? 0,
+        redeemCount: cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0),
+        analytics: {
+          byDay: buildLast7Days(now, dayMap, TZ),
+          newCustomers7d: newCustomersResult?.value ?? 0,
+          returningCount: perCustomer.filter((r) => Number(r.value) > 1).length,
+          redemptionRate,
+        },
       }
-    }
+    })
 
-    return { tenant, program: program ?? null, customerCount, stampCount, redeemCount, analytics }
-  })
-
-  if (!data) redirect('/login')
-  const { tenant, program, customerCount, stampCount, redeemCount, analytics } = data
+    customerCount = stats.customerCount
+    stampCount = stats.stampCount
+    redeemCount = stats.redeemCount
+    analytics = stats.analytics
+  }
 
   const weekTotal = analytics?.byDay.reduce((s, d) => s + d.count, 0) ?? 0
   const maxDay = analytics ? Math.max(1, ...analytics.byDay.map((d) => d.count)) : 1
@@ -133,7 +112,7 @@ export default async function DashboardPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight text-fg">{tenant!.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-fg">{tenant.name}</h1>
             <Badge variant="gold">{t('active')}</Badge>
           </div>
           <p className="text-muted text-sm mt-1">{t('welcome')}</p>
@@ -142,7 +121,6 @@ export default async function DashboardPage() {
 
       {!program ? (
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-600 to-amber-700 p-8 text-white shadow-e2">
-          {/* Dot pattern overlay */}
           <div
             className="absolute inset-0 opacity-[0.04]"
             style={{
@@ -156,9 +134,7 @@ export default async function DashboardPage() {
               <Rocket className="w-6 h-6" strokeWidth={2} />
             </div>
             <h2 className="text-xl font-bold mb-2">{t('setupTitle')}</h2>
-            <p className="text-amber-100 text-sm mb-6 max-w-md">
-              {t('setupBody')}
-            </p>
+            <p className="text-amber-100 text-sm mb-6 max-w-md">{t('setupBody')}</p>
             <Link href="/dashboard/onboarding">
               <Button variant="secondary" size="lg" className="bg-white text-amber-700 border-0 hover:bg-amber-50 shadow-lg">
                 {t('setupCta')}

@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
-import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
+import { customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
+import { requireTenant } from '@/lib/tenant'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -14,21 +14,16 @@ interface PageProps {
 
 export default async function CustomerDetailPage({ params }: PageProps) {
   const { customerId } = await params
-
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
+  const { user, tenant } = await requireTenant()
   const t = await getTranslations('customerDetail')
 
   const data = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return null
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, customerId))
+      .limit(1)
 
-    const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
-    // RLS ya aísla por tenant; este check es defensa en profundidad.
     if (!customer || customer.tenantId !== tenant.id) return null
 
     const [card] = await tx
@@ -59,7 +54,6 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const stampsRequired = program?.stampsRequired ?? 0
   const totalRedeemed = card?.totalRedeemed ?? 0
 
-  // Format date using Intl — locale-aware but no server-side locale injection needed for date display
   const dateFmt = new Intl.DateTimeFormat('es-CO', {
     timeZone: 'America/Bogota',
     dateStyle: 'medium',
@@ -78,7 +72,6 @@ export default async function CustomerDetailPage({ params }: PageProps) {
         {t('backToCustomers')}
       </Link>
 
-      {/* Encabezado del cliente */}
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-500/20 dark:to-amber-500/10 flex items-center justify-center shrink-0">
           <span className="text-amber-700 dark:text-amber-400 font-bold text-xl">{displayName.charAt(0).toUpperCase()}</span>
@@ -93,7 +86,6 @@ export default async function CustomerDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Estado de la tarjeta */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card padding="md" className="border-amber-100 dark:border-amber-500/20">
           <p className="text-3xl font-bold tabular-nums text-amber-700 dark:text-amber-400">
@@ -122,7 +114,6 @@ export default async function CustomerDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Historial */}
       <div>
         <h2 className="font-semibold text-fg mb-3">{t('history')}</h2>
         {events.length === 0 ? (
