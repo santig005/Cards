@@ -31,7 +31,7 @@ export default async function OnboardingPage() {
   const isEditing = !!existingProgram
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-2xl p-6 text-white mb-8">
