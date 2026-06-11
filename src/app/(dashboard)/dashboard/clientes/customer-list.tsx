@@ -82,8 +82,8 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
       <Card padding="lg" className="text-center space-y-4 py-16">
         <div className="text-6xl">👥</div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">{t('noCustomersTitle')}</h2>
-          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+          <h2 className="text-lg font-semibold text-fg mb-2">{t('noCustomersTitle')}</h2>
+          <p className="text-sm text-muted max-w-sm mx-auto">
             {t('noCustomersBody')}
           </p>
         </div>
@@ -102,7 +102,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
             </svg>
           </div>
@@ -115,7 +115,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
             }}
             placeholder={t('searchPlaceholder')}
             aria-label={t('searchLabel')}
-            className="h-10 pl-9 pr-4 w-full rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
+            className="h-10 pl-9 pr-4 w-full rounded-xl border border-border bg-surface text-sm text-fg placeholder:text-muted shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
           />
         </div>
         <select
@@ -125,7 +125,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
             setPage(0)
           }}
           aria-label={t('sortLabel')}
-          className="h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
+          className="h-10 px-3 rounded-xl border border-border bg-surface text-sm text-fg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>

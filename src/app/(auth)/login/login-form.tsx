@@ -52,7 +52,7 @@ export function LoginForm() {
         <div className="text-right">
           <button
             type="button"
-            className="text-xs text-stone-400 hover:text-amber-400 transition-colors"
+            className="text-xs text-muted hover:text-amber-600 transition-colors"
           >
             {t('forgotPassword')}
           </button>
@@ -60,7 +60,7 @@ export function LoginForm() {
       </div>
 
       {state?.error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 dark:text-red-400 dark:bg-red-950/40 dark:border-red-900/50">
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 3.75a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5zm.75 7a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" />
           </svg>

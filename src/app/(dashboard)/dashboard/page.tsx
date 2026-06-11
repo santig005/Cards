@@ -133,10 +133,10 @@ export default async function DashboardPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight text-stone-900">{tenant!.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-fg">{tenant!.name}</h1>
             <Badge variant="gold">{t('active')}</Badge>
           </div>
-          <p className="text-stone-500 text-sm mt-1">{t('welcome')}</p>
+          <p className="text-muted text-sm mt-1">{t('welcome')}</p>
         </div>
       </div>
 
@@ -172,17 +172,17 @@ export default async function DashboardPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { label: t('statCustomers'), value: customerCount, Icon: Users, accent: 'bg-stone-100 text-stone-600', description: t('statCustomersDesc') },
-              { label: t('statStamps'), value: stampCount, Icon: Award, accent: 'bg-amber-100 text-amber-700', description: t('statStampsDesc') },
-              { label: t('statRedemptions'), value: redeemCount, Icon: Gift, accent: 'bg-emerald-100 text-emerald-700', description: t('statRedemptionsDesc') },
+              { label: t('statCustomers'), value: customerCount, Icon: Users, accent: 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300', description: t('statCustomersDesc') },
+              { label: t('statStamps'), value: stampCount, Icon: Award, accent: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400', description: t('statStampsDesc') },
+              { label: t('statRedemptions'), value: redeemCount, Icon: Gift, accent: 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400', description: t('statRedemptionsDesc') },
             ].map(({ label, value, Icon, accent, description }) => (
               <Card key={label} padding="md" className="card-hover">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${accent}`}>
                   <Icon className="w-5 h-5" strokeWidth={2} />
                 </div>
-                <p className="text-3xl font-bold tabular-nums text-stone-800">{value}</p>
-                <p className="text-sm font-medium text-stone-700 mt-0.5">{label}</p>
-                <p className="text-xs text-stone-400 mt-0.5">{description}</p>
+                <p className="text-3xl font-bold tabular-nums text-fg">{value}</p>
+                <p className="text-sm font-medium text-fg mt-0.5">{label}</p>
+                <p className="text-xs text-muted mt-0.5">{description}</p>
               </Card>
             ))}
           </div>
@@ -190,13 +190,13 @@ export default async function DashboardPage() {
           <Card padding="md">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <p className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-1">
+                <p className="text-xs font-medium text-muted uppercase tracking-wide mb-1">
                   {t('activeProgram')}
                 </p>
-                <p className="font-semibold text-stone-800">
+                <p className="font-semibold text-fg">
                   {program.stampsRequired} {t('stampPlural')} → {REWARD_LABELS[program.rewardType] ?? program.rewardType}
                 </p>
-                <p className="text-sm text-stone-500 mt-0.5">{program.rewardDescription}</p>
+                <p className="text-sm text-muted mt-0.5">{program.rewardDescription}</p>
               </div>
               <Link href="/dashboard/onboarding">
                 <Button variant="ghost" size="sm" className="gap-1.5 text-amber-600 hover:text-amber-700">
@@ -222,11 +222,11 @@ export default async function DashboardPage() {
           </div>
 
           {analytics && (
-            <Card padding="md" className="border-amber-100">
+            <Card padding="md" className="border-amber-100 dark:border-amber-500/20">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('analyticsTitle')}</p>
-                  <p className="font-semibold text-gray-800">{t('analyticsSubtitle')}</p>
+                  <p className="text-xs font-medium text-muted uppercase tracking-wide">{t('analyticsTitle')}</p>
+                  <p className="font-semibold text-fg">{t('analyticsSubtitle')}</p>
                 </div>
                 <span className="text-sm font-medium text-amber-700">{t('thisWeek', { count: weekTotal })}</span>
               </div>
@@ -243,25 +243,25 @@ export default async function DashboardPage() {
                           title={`${d.count} ${d.count === 1 ? t('stampSingular') : t('stampPlural')}`}
                         />
                       </div>
-                      <span className="text-[10px] text-gray-400 tabular-nums">{d.count}</span>
-                      <span className="text-[10px] text-gray-400">{d.label}</span>
+                      <span className="text-[10px] text-muted tabular-nums">{d.count}</span>
+                      <span className="text-[10px] text-muted">{d.label}</span>
                     </div>
                   )
                 })}
               </div>
 
               <div className="grid grid-cols-3 gap-3 mt-5">
-                <div className="rounded-xl bg-stone-50 p-3">
-                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.newCustomers7d}</p>
-                  <p className="text-xs text-gray-500">{t('newCustomers7d')}</p>
+                <div className="rounded-xl bg-surface-2 p-3">
+                  <p className="text-lg font-bold text-fg tabular-nums">{analytics.newCustomers7d}</p>
+                  <p className="text-xs text-muted">{t('newCustomers7d')}</p>
                 </div>
-                <div className="rounded-xl bg-stone-50 p-3">
-                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.returningCount}</p>
-                  <p className="text-xs text-gray-500">{t('returningCustomers')}</p>
+                <div className="rounded-xl bg-surface-2 p-3">
+                  <p className="text-lg font-bold text-fg tabular-nums">{analytics.returningCount}</p>
+                  <p className="text-xs text-muted">{t('returningCustomers')}</p>
                 </div>
-                <div className="rounded-xl bg-stone-50 p-3">
-                  <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.redemptionRate}%</p>
-                  <p className="text-xs text-gray-500">{t('redemptionRate')}</p>
+                <div className="rounded-xl bg-surface-2 p-3">
+                  <p className="text-lg font-bold text-fg tabular-nums">{analytics.redemptionRate}%</p>
+                  <p className="text-xs text-muted">{t('redemptionRate')}</p>
                 </div>
               </div>
             </Card>

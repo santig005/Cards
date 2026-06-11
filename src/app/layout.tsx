@@ -25,8 +25,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale()
 
   return (
-    <html lang={locale} className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-surface text-gray-900">
+    <html lang={locale} className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Anti-FOUC: fija .dark antes del primer paint, según cookie o preferencia del SO */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var c=document.cookie.match(/sellio-theme=([^;]+)/);var s=c?c[1]:'';var d=s==='dark'||(s===''&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();",
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-bg text-fg">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

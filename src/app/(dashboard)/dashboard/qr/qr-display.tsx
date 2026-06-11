@@ -40,10 +40,10 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
     <div className="flex flex-col items-center gap-6">
       {/* Instruction */}
       <div className="flex items-center justify-center gap-2 mb-1">
-        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center shrink-0">
           <span className="text-base">📲</span>
         </div>
-        <p className="text-sm font-medium text-gray-600">{t('showQr')}</p>
+        <p className="text-sm font-medium text-fg">{t('showQr')}</p>
       </div>
 
       {/* QR Code */}
@@ -60,14 +60,14 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
 
       {/* Link pill + copy button */}
       <div className="mt-1 flex items-center gap-2 w-full">
-        <div className="flex-1 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs font-mono text-amber-700 truncate">
+        <div className="flex-1 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl px-3 py-2 text-xs font-mono text-amber-700 dark:text-amber-400 truncate">
           {url}
         </div>
         <button
           onClick={handleCopy}
           className={`shrink-0 h-9 px-3 rounded-xl text-xs font-semibold transition-colors ${
             copied
-              ? 'bg-emerald-100 text-emerald-700'
+              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
               : 'bg-amber-500 text-stone-950 hover:bg-amber-400'
           }`}
         >
@@ -78,7 +78,7 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
       {/* Download button */}
       <button
         onClick={handleDownload}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-amber-600 transition-colors underline underline-offset-4"
+        className="flex items-center gap-2 text-sm text-muted hover:text-amber-600 transition-colors underline underline-offset-4"
       >
         {t('downloadSvg')}
       </button>

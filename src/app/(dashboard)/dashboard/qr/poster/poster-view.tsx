@@ -21,7 +21,7 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
       {/* Controles — no se imprimen */}
       <div className="print:hidden flex items-center justify-between gap-3 mb-6 max-w-[420px] mx-auto">
         <Link href="/dashboard/qr">
-          <Button variant="ghost" size="sm" className="text-gray-500">{t('back')}</Button>
+          <Button variant="ghost" size="sm" className="text-muted">{t('back')}</Button>
         </Link>
         <Button
           type="button"
@@ -91,7 +91,7 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
         </div>
       </div>
 
-      <p className="print:hidden text-center text-xs text-gray-400 mt-6 max-w-sm mx-auto">
+      <p className="print:hidden text-center text-xs text-muted mt-6 max-w-sm mx-auto">
         {t('printTip')}
       </p>
     </div>

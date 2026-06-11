@@ -50,13 +50,13 @@ export function RegisterForm() {
   if (state?.success) {
     return (
       <div className="text-center py-8 space-y-3">
-        <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto">
-          <svg className="w-7 h-7 text-amber-600" viewBox="0 0 24 24" fill="none">
+        <div className="w-14 h-14 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center mx-auto">
+          <svg className="w-7 h-7 text-amber-600 dark:text-amber-400" viewBox="0 0 24 24" fill="none">
             <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="font-semibold text-gray-900">{t('almostReady')}</p>
-        <p className="text-sm text-gray-500">{state.success}</p>
+        <p className="font-semibold text-fg">{t('almostReady')}</p>
+        <p className="text-sm text-muted">{state.success}</p>
       </div>
     )
   }
@@ -91,7 +91,7 @@ export function RegisterForm() {
       />
 
       {state?.error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 dark:text-red-400 dark:bg-red-950/40 dark:border-red-900/50">
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 16 16" fill="currentColor">
             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 3.75a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5zm.75 7a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" />
           </svg>
@@ -109,7 +109,7 @@ export function RegisterForm() {
         {t('registerCta')}
       </Button>
 
-      <p className="text-center text-xs text-gray-400 mt-3">
+      <p className="text-center text-xs text-muted mt-3">
         {t('registerNoCard')}
       </p>
     </form>

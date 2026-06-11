@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className={`text-sm font-medium select-none ${dark ? 'text-stone-300' : 'text-stone-700'}`}>
+          <label htmlFor={inputId} className={`text-sm font-medium select-none ${dark ? 'text-stone-300' : 'text-fg'}`}>
             {label}
           </label>
         )}
@@ -35,11 +35,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               ${icon ? 'pl-10 pr-3' : 'px-3.5'}
               ${dark
                 ? 'bg-stone-800 border border-stone-700 text-stone-100 placeholder:text-stone-500 hover:border-stone-600'
-                : 'bg-white border text-stone-900 placeholder:text-stone-400'
+                : 'bg-surface border text-fg placeholder:text-muted'
               }
               ${error
                 ? 'border-red-400 focus:ring-red-300/40'
-                : dark ? '' : 'border-stone-300 hover:border-stone-400'
+                : dark ? '' : 'border-border hover:border-border-strong'
               }
               ${className}
             `}
@@ -54,7 +54,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         )}
-        {hint && !error && <p className={`text-xs ${dark ? 'text-stone-500' : 'text-stone-400'}`}>{hint}</p>}
+        {hint && !error && <p className={`text-xs ${dark ? 'text-stone-500' : 'text-muted'}`}>{hint}</p>}
       </div>
     )
   }

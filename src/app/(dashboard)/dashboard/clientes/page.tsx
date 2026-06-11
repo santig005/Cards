@@ -35,13 +35,13 @@ export default async function ClientesPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-fg">{t('title')}</h1>
+          <p className="text-muted text-sm mt-1">{t('subtitle')}</p>
         </div>
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
-          <h2 className="font-semibold text-gray-800">{t('configFirst')}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="font-semibold text-fg">{t('configFirst')}</h2>
+          <p className="text-sm text-muted">
             {t('configFirstBody')}
           </p>
           <Link href="/dashboard/onboarding">
@@ -77,8 +77,8 @@ export default async function ClientesPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-fg">{t('title')}</h1>
+          <p className="text-muted text-sm mt-1">
             {count > 0 ? registeredLabel : t('subtitle')}
           </p>
         </div>
@@ -87,9 +87,9 @@ export default async function ClientesPage() {
         </Link>
       </div>
 
-      <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
+      <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl px-4 py-3 flex items-center gap-3">
         <span className="text-xl">🏅</span>
-        <p className="text-sm text-amber-800">
+        <p className="text-sm text-amber-800 dark:text-amber-400">
           <span className="font-semibold">{t('stampsToWin', { count: program.stampsRequired })}</span>{' '}
           {t('toWin')}{' '}
           <span className="font-medium">{program.rewardDescription}</span>
