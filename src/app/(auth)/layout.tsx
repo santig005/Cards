@@ -1,4 +1,14 @@
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+import { getTranslations } from 'next-intl/server'
+
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const t = await getTranslations('auth')
+
+  const features = [
+    t('leftPanelFeature1'),
+    t('leftPanelFeature2'),
+    t('leftPanelFeature3'),
+  ]
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Left panel — desktop only */}
@@ -20,14 +30,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10 space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-stone-100 leading-tight">
-              Fidelizá a tus clientes.<br />Sin tarjetas físicas.
+              {t('leftPanelHeadline')}<br />{t('leftPanelHeadline2')}
             </h2>
             <ul className="space-y-3">
-              {[
-                'Sin app nativa',
-                'QR listo en 2 minutos',
-                'Gratis para empezar',
-              ].map((feature) => (
+              {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-stone-200 text-sm">
                   <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
                     <svg className="w-3 h-3 text-amber-400" viewBox="0 0 12 12" fill="none">
@@ -43,15 +49,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Testimonial card */}
           <div className="rounded-2xl bg-amber-500/10 backdrop-blur-sm border border-amber-500/20 p-5 space-y-3">
             <p className="text-stone-100/90 text-sm leading-relaxed">
-              &ldquo;Aumenté la retención un 40% en los primeros dos meses. La experiencia del cliente es increíble.&rdquo;
+              {t('testimonialQuote')}
             </p>
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300 text-xs font-bold shrink-0">
-                J
+                {t('testimonialName').charAt(0)}
               </div>
               <div>
-                <p className="text-stone-100 text-xs font-semibold">Juan Martínez</p>
-                <p className="text-stone-400 text-xs">Café El Rincón</p>
+                <p className="text-stone-100 text-xs font-semibold">{t('testimonialName')}</p>
+                <p className="text-stone-400 text-xs">{t('testimonialBusiness')}</p>
               </div>
             </div>
           </div>
@@ -59,7 +65,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         {/* Bottom tagline */}
         <div className="relative z-10">
-          <p className="text-stone-500 text-xs">© 2026 Sellio · Fidelización digital</p>
+          <p className="text-stone-500 text-xs">{t('copyright')}</p>
         </div>
       </div>
 

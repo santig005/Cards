@@ -1,7 +1,10 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { LoginForm } from './login-form'
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const t = await getTranslations('auth')
+
   return (
     <div className="w-full max-w-sm animate-fade-up">
       <div className="mb-8">
@@ -13,16 +16,16 @@ export default function LoginPage() {
           <span className="font-bold text-gray-900">Sellio</span>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900">Bienvenido de vuelta</h2>
-        <p className="text-gray-500 text-sm mt-1">Ingresá a tu panel de fidelización</p>
+        <h2 className="text-2xl font-bold text-gray-900">{t('loginTitle')}</h2>
+        <p className="text-gray-500 text-sm mt-1">{t('loginSubtitle')}</p>
       </div>
 
       <LoginForm />
 
       <p className="text-center text-sm text-gray-500 mt-6">
-        ¿No tenés cuenta?{' '}
+        {t('noAccount')}{' '}
         <Link href="/registro" className="text-amber-600 font-semibold hover:text-amber-700">
-          Registrá tu negocio →
+          {t('registerLink')}
         </Link>
       </p>
     </div>

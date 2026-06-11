@@ -7,9 +7,10 @@ import { locales, localeNames, LOCALE_COOKIE } from '@/i18n/config'
 
 interface LocaleSwitcherProps {
   className?: string
+  variant?: 'dark' | 'light'
 }
 
-export function LocaleSwitcher({ className = '' }: LocaleSwitcherProps) {
+export function LocaleSwitcher({ className = '', variant = 'dark' }: LocaleSwitcherProps) {
   const router = useRouter()
   const active = useLocale()
   const t = useTranslations('common')
@@ -22,13 +23,18 @@ export function LocaleSwitcher({ className = '' }: LocaleSwitcherProps) {
     startTransition(() => router.refresh())
   }
 
+  const variantClass =
+    variant === 'light'
+      ? 'border border-stone-300 bg-white text-stone-700 focus:ring-amber-500/40'
+      : 'border border-white/15 bg-white/5 text-stone-300 focus:ring-amber-500/40'
+
   return (
     <select
       value={active}
       onChange={onChange}
       disabled={isPending}
       aria-label={t('language')}
-      className={`rounded-lg border border-white/15 bg-white/5 px-2 py-1 text-xs text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${className}`}
+      className={`rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 ${variantClass} ${className}`}
     >
       {locales.map((l) => (
         <option key={l} value={l} className="text-stone-900">

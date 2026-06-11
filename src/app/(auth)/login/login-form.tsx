@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import { useTranslations } from 'next-intl'
 import { login } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +22,7 @@ const LockIcon = (
 )
 
 export function LoginForm() {
+  const t = useTranslations('auth')
   const [state, action, pending] = useActionState(
     async (_: unknown, formData: FormData) => login(formData),
     null
@@ -31,20 +33,20 @@ export function LoginForm() {
       <Input
         name="email"
         type="email"
-        label="Email"
+        label={t('emailLabel')}
         required
         autoComplete="email"
-        placeholder="tu@negocio.com"
+        placeholder={t('emailPlaceholder')}
         icon={EmailIcon}
       />
       <div className="space-y-1.5">
         <Input
           name="password"
           type="password"
-          label="Contraseña"
+          label={t('passwordLabel')}
           required
           autoComplete="current-password"
-          placeholder="••••••••"
+          placeholder={t('passwordPlaceholder')}
           icon={LockIcon}
         />
         <div className="text-right">
@@ -52,7 +54,7 @@ export function LoginForm() {
             type="button"
             className="text-xs text-stone-400 hover:text-amber-400 transition-colors"
           >
-            ¿Olvidaste tu contraseña?
+            {t('forgotPassword')}
           </button>
         </div>
       </div>
@@ -73,7 +75,7 @@ export function LoginForm() {
         loading={pending}
         className="w-full mt-2"
       >
-        Ingresar →
+        {t('loginCta')}
       </Button>
     </form>
   )

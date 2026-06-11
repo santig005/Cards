@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { QRCodeSVG } from 'qrcode.react'
 import { Button } from '@/components/ui/button'
 
@@ -13,12 +14,14 @@ interface PosterViewProps {
 }
 
 export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequired, url }: PosterViewProps) {
+  const t = useTranslations('poster')
+
   return (
     <div>
       {/* Controles — no se imprimen */}
       <div className="print:hidden flex items-center justify-between gap-3 mb-6 max-w-[420px] mx-auto">
         <Link href="/dashboard/qr">
-          <Button variant="ghost" size="sm" className="text-gray-500">← Volver</Button>
+          <Button variant="ghost" size="sm" className="text-gray-500">{t('back')}</Button>
         </Link>
         <Button
           type="button"
@@ -26,7 +29,7 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
           onClick={() => window.print()}
           className="gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]"
         >
-          🖨️ Imprimir / Guardar PDF
+          {t('printSave')}
         </Button>
       </div>
 
@@ -54,7 +57,7 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
             )}
             <h1 className="text-3xl font-bold text-stone-950 leading-tight">{tenantName}</h1>
             <p className="text-stone-900/70 text-sm font-medium uppercase tracking-wider">
-              Programa de fidelización
+              {t('loyaltyProgram')}
             </p>
           </div>
         </div>
@@ -62,10 +65,10 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
         {/* Cuerpo */}
         <div className="px-8 py-8 text-center space-y-6">
           <div>
-            <p className="text-gray-500 text-sm">Acumulá sellos y ganá</p>
+            <p className="text-gray-500 text-sm">{t('collectStamps')}</p>
             <p className="text-2xl font-bold text-gray-900 mt-1 leading-snug">{rewardDescription}</p>
             <p className="text-amber-600 text-sm font-semibold mt-2">
-              Con {stampsRequired} sellos es tuyo 🎁
+              {t('stampsToGet', { count: stampsRequired })}
             </p>
           </div>
 
@@ -75,22 +78,21 @@ export function PosterView({ tenantName, logoUrl, rewardDescription, stampsRequi
           </div>
 
           <div className="space-y-1">
-            <p className="text-lg font-bold text-gray-900">📲 Escaneá con tu celular</p>
-            <p className="text-gray-500 text-sm">Sumá tu primer sello en segundos, sin apps.</p>
+            <p className="text-lg font-bold text-gray-900">{t('scanInstructions')}</p>
+            <p className="text-gray-500 text-sm">{t('scanSubtitle')}</p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="px-8 pb-6 text-center">
           <p className="text-xs text-gray-400">
-            Powered by <span className="text-amber-500 font-semibold">Sellio</span>
+            {t('poweredBy')} <span className="text-amber-500 font-semibold">Sellio</span>
           </p>
         </div>
       </div>
 
       <p className="print:hidden text-center text-xs text-gray-400 mt-6 max-w-sm mx-auto">
-        💡 En el diálogo de impresión podés elegir <span className="font-medium">&ldquo;Guardar como PDF&rdquo;</span>{' '}
-        para descargarlo y mandarlo a imprimir.
+        {t('printTip')}
       </p>
     </div>
   )

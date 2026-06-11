@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
@@ -11,12 +12,6 @@ interface PageProps {
   params: Promise<{ customerId: string }>
 }
 
-const dateFmt = new Intl.DateTimeFormat('es-CO', {
-  timeZone: 'America/Bogota',
-  dateStyle: 'medium',
-  timeStyle: 'short',
-})
-
 export default async function CustomerDetailPage({ params }: PageProps) {
   const { customerId } = await params
 
@@ -25,6 +20,8 @@ export default async function CustomerDetailPage({ params }: PageProps) {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const t = await getTranslations('customerDetail')
 
   const data = await withAuth(user.id, async (tx) => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -62,6 +59,13 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const stampsRequired = program?.stampsRequired ?? 0
   const totalRedeemed = card?.totalRedeemed ?? 0
 
+  // Format date using Intl — locale-aware but no server-side locale injection needed for date display
+  const dateFmt = new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+
   return (
     <div className="space-y-6">
       <Link
@@ -71,7 +75,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Volver a clientes
+        {t('backToCustomers')}
       </Link>
 
       {/* Encabezado del cliente */}
@@ -85,7 +89,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
             {customer.phone}
             {customer.email ? ` · ${customer.email}` : ''}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">Cliente desde {dateFmt.format(new Date(customer.createdAt))}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{t('since', { date: dateFmt.format(new Date(customer.createdAt)) })}</p>
         </div>
       </div>
 
@@ -96,15 +100,15 @@ export default async function CustomerDetailPage({ params }: PageProps) {
             {currentStamps}
             <span className="text-base text-gray-400">/{stampsRequired || '—'}</span>
           </p>
-          <p className="text-sm text-gray-500 mt-0.5">Sellos actuales</p>
+          <p className="text-sm text-gray-500 mt-0.5">{t('currentStamps')}</p>
         </Card>
         <Card padding="md" className="border-emerald-100">
           <p className="text-3xl font-bold tabular-nums text-emerald-700">{totalRedeemed}</p>
-          <p className="text-sm text-gray-500 mt-0.5">Canjes totales</p>
+          <p className="text-sm text-gray-500 mt-0.5">{t('totalRedemptions')}</p>
         </Card>
         <Card padding="md">
           <p className="text-3xl font-bold tabular-nums text-stone-700">{events.length}</p>
-          <p className="text-sm text-gray-500 mt-0.5">Eventos registrados</p>
+          <p className="text-sm text-gray-500 mt-0.5">{t('eventsCount')}</p>
         </Card>
       </div>
 
@@ -112,7 +116,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
         <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
           <span className="text-xl">🎁</span>
           <p className="text-sm text-amber-800">
-            <span className="font-semibold">{program.stampsRequired} sellos</span> para:{' '}
+            <span className="font-semibold">{t('stampsToReward', { count: program.stampsRequired })}</span>{' '}
             <span className="font-medium">{program.rewardDescription}</span>
           </p>
         </div>
@@ -120,10 +124,10 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 
       {/* Historial */}
       <div>
-        <h2 className="font-semibold text-gray-800 mb-3">Historial</h2>
+        <h2 className="font-semibold text-gray-800 mb-3">{t('history')}</h2>
         {events.length === 0 ? (
           <Card padding="lg" className="text-center py-10">
-            <p className="text-sm text-gray-500">Todavía no hay actividad de este cliente.</p>
+            <p className="text-sm text-gray-500">{t('noActivity')}</p>
           </Card>
         ) : (
           <div className="space-y-2">
@@ -140,13 +144,13 @@ export default async function CustomerDetailPage({ params }: PageProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800">
-                      {isRedeem ? 'Premio canjeado' : 'Sello registrado'}
+                      {isRedeem ? t('rewardRedeemed') : t('stampRegistered')}
                     </p>
                     <p className="text-xs text-gray-400">{dateFmt.format(new Date(ev.createdAt))}</p>
                   </div>
                   {isRedeem && (
                     <Badge variant="success" className="text-xs">
-                      Canje
+                      {t('redeemBadge')}
                     </Badge>
                   )}
                 </Card>

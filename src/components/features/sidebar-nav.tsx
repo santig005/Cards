@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LogOut } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { logout } from '@/app/(auth)/actions'
 import { NAV_ITEMS, isNavActive } from './nav-items'
+import { LocaleSwitcher } from './locale-switcher'
 
 interface SidebarNavProps {
   tenantName: string
@@ -13,6 +15,8 @@ interface SidebarNavProps {
 
 export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
   const pathname = usePathname()
+  const t = useTranslations('nav')
+  const ts = useTranslations('sidebar')
 
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-surface border-r border-border min-h-screen sticky top-0 h-screen">
@@ -22,10 +26,11 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)] shrink-0">
             <span className="text-stone-950 font-bold text-base">S</span>
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="font-semibold text-stone-900 text-sm leading-tight truncate">{tenantName}</p>
             <p className="text-xs text-stone-500 truncate">{userEmail}</p>
           </div>
+          <LocaleSwitcher variant="light" />
         </div>
       </div>
 
@@ -49,7 +54,7 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-amber-500" />
               )}
               <Icon className="w-[18px] h-[18px] shrink-0" strokeWidth={active ? 2.4 : 2} />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           )
         })}
@@ -61,8 +66,8 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
           ✦
         </div>
         <div>
-          <p className="text-xs font-semibold text-amber-700 leading-tight">Plan Básico</p>
-          <p className="text-[10px] text-amber-600/80">Gratis para siempre</p>
+          <p className="text-xs font-semibold text-amber-700 leading-tight">{ts('planName')}</p>
+          <p className="text-[10px] text-amber-600/80">{ts('planSubtitle')}</p>
         </div>
       </div>
 
@@ -74,7 +79,7 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
           >
             <LogOut className="w-[18px] h-[18px] shrink-0" strokeWidth={2} />
-            Cerrar sesión
+            {ts('logout')}
           </button>
         </form>
       </div>

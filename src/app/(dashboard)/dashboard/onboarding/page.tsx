@@ -1,4 +1,5 @@
-﻿import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
@@ -13,6 +14,8 @@ export default async function OnboardingPage() {
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  const t = await getTranslations('onboarding')
 
   const result = await withAuth(user.id, async (tx) => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -30,6 +33,8 @@ export default async function OnboardingPage() {
 
   const isEditing = !!existingProgram
 
+  const steps = [t('stepAccount'), t('stepProgram'), t('stepReady')]
+
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
@@ -40,20 +45,20 @@ export default async function OnboardingPage() {
               {isEditing ? '✓' : '1'}
             </div>
             <p className="text-amber-100 text-sm">
-              {isEditing ? 'Editando programa' : 'Configuración inicial'}
+              {isEditing ? t('editingLabel') : t('initialSetup')}
             </p>
           </div>
           <h1 className="text-2xl font-bold">
-            {isEditing ? 'Editá tu programa' : 'Configurá tu programa'}
+            {isEditing ? t('editTitle') : t('createTitle')}
           </h1>
           <p className="text-amber-100 text-sm mt-1">
-            {isEditing ? 'Los cambios se aplican de inmediato' : 'Solo tomará 2 minutos ⚡'}
+            {isEditing ? t('editSubtitle') : t('createSubtitle')}
           </p>
         </div>
 
         {!isEditing && (
           <div className="flex items-center justify-center gap-2 mb-8">
-            {['Cuenta', 'Programa', 'Listo'].map((step, i) => (
+            {steps.map((step, i) => (
               <div key={step} className="flex items-center gap-2">
                 <div
                   className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold transition-all ${
@@ -88,7 +93,7 @@ export default async function OnboardingPage() {
         </Card>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          Podés cambiar esta configuración cuando quieras.
+          {t('changeLater')}
         </p>
       </div>
     </div>

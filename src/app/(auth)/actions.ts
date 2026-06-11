@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
 import { tenants } from '@/lib/drizzle/schema'
@@ -29,7 +30,10 @@ export async function login(formData: FormData) {
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword(result.data)
 
-  if (error) return { error: 'Email o contraseña incorrectos' }
+  if (error) {
+    const t = await getTranslations('errors')
+    return { error: t('invalidCredentials') }
+  }
 
   redirect('/dashboard')
 }
@@ -54,7 +58,9 @@ export async function register(formData: FormData) {
   })
 
   if (error) return { error: error.message }
-  if (!data.user) return { error: 'Error al crear la cuenta' }
+
+  const t = await getTranslations('errors')
+  if (!data.user) return { error: t('accountCreationError') }
 
   // Crear el tenant en la DB
   const baseSlug = slugify(result.data.businessName)
@@ -70,7 +76,8 @@ export async function register(formData: FormData) {
     redirect('/dashboard/onboarding')
   }
 
-  return { success: 'Revisá tu email para confirmar tu cuenta antes de ingresar.' }
+  const tAuth = await getTranslations('errors')
+  return { success: tAuth('checkEmail') }
 }
 
 export async function logout() {
