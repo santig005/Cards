@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
-import { createProgramSchema } from '@/lib/validations/onboarding'
+import { buildCreateProgramSchema } from '@/lib/validations/onboarding'
 import { eq } from 'drizzle-orm'
 
 const LOGO_BUCKET = 'logos'
@@ -42,7 +42,17 @@ export async function createProgram(formData: FormData) {
     rewardDescription: formData.get('rewardDescription') as string,
   }
 
-  const result = createProgramSchema.safeParse(raw)
+  const v = await getTranslations('validation')
+  const schema = buildCreateProgramSchema({
+    stampsMin: v('stampsMin'),
+    stampsMax: v('stampsMax'),
+    rewardTypeRequired: v('rewardTypeRequired'),
+    descMin3: v('descMin3'),
+    descMax200: v('descMax200'),
+    nameMin2: v('nameMin2'),
+    nameMax80: v('nameMax80'),
+  })
+  const result = schema.safeParse(raw)
   if (!result.success) {
     return { error: result.error.issues[0].message }
   }

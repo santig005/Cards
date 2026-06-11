@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
 import { tenants } from '@/lib/drizzle/schema'
-import { loginSchema, registerSchema } from '@/lib/validations/auth'
+import { buildLoginSchema, buildRegisterSchema } from '@/lib/validations/auth'
 
 function slugify(text: string): string {
   return text
@@ -22,7 +22,14 @@ export async function login(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const result = loginSchema.safeParse(raw)
+  const v = await getTranslations('validation')
+  const schema = buildLoginSchema({
+    emailInvalid: v('emailInvalid'),
+    passwordMin: v('passwordMin'),
+    nameMin2: v('nameMin2'),
+    nameMax80: v('nameMax80'),
+  })
+  const result = schema.safeParse(raw)
   if (!result.success) {
     return { error: result.error.issues[0].message }
   }
@@ -45,7 +52,14 @@ export async function register(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const result = registerSchema.safeParse(raw)
+  const v = await getTranslations('validation')
+  const schema = buildRegisterSchema({
+    emailInvalid: v('emailInvalid'),
+    passwordMin: v('passwordMin'),
+    nameMin2: v('nameMin2'),
+    nameMax80: v('nameMax80'),
+  })
+  const result = schema.safeParse(raw)
   if (!result.success) {
     return { error: result.error.issues[0].message }
   }

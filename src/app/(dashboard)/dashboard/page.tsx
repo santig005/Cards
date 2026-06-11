@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq, and, count, gte, sql } from 'drizzle-orm'
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 export default async function DashboardPage() {
   const { user, tenant, program } = await requireTenant()
   const t = await getTranslations('dashboard')
+  const locale = await getLocale()
 
   let customerCount = 0
   let stampCount = 0
@@ -83,7 +84,7 @@ export default async function DashboardPage() {
         stampCount: stampResult?.value ?? 0,
         redeemCount: cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0),
         analytics: {
-          byDay: buildLast7Days(now, dayMap, TZ),
+          byDay: buildLast7Days(now, dayMap, TZ, locale),
           newCustomers7d: newCustomersResult?.value ?? 0,
           returningCount: perCustomer.filter((r) => Number(r.value) > 1).length,
           redemptionRate,
