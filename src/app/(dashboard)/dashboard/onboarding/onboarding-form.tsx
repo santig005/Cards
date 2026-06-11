@@ -68,14 +68,14 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
     <form action={handleSubmit} className="space-y-8">
       {/* Logo */}
       <div className="space-y-2">
-        <p className="text-sm font-medium text-gray-700">{t('logoLabel')}</p>
+        <p className="text-sm font-medium text-fg">{t('logoLabel')}</p>
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20 flex items-center justify-center overflow-hidden shrink-0">
             {logoPreview ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={logoPreview} alt={t('logoAlt')} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-2xl text-amber-300">🏪</span>
+              <span className="text-2xl text-amber-300 dark:text-amber-500/70">🏪</span>
             )}
           </div>
           <div className="flex flex-col gap-1">
@@ -87,7 +87,7 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
             >
               {logoPreview ? t('changeLogo') : t('uploadLogo')}
             </Button>
-            <span className="text-xs text-gray-400">{t('logoHint')}</span>
+            <span className="text-xs text-muted">{t('logoHint')}</span>
           </div>
           <input
             ref={logoInputRef}
@@ -127,7 +127,7 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
 
       {/* Reward type */}
       <div className="space-y-3">
-        <p className="text-sm font-medium text-gray-700">{t('rewardTypeLabel')}</p>
+        <p className="text-sm font-medium text-fg">{t('rewardTypeLabel')}</p>
         <input type="hidden" name="rewardType" value={selectedReward} />
         <div className="grid grid-cols-2 gap-3">
           {REWARD_OPTIONS.map((option) => (
@@ -137,8 +137,8 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
               onClick={() => setSelectedReward(option.value)}
               className={`relative flex flex-col items-start gap-1.5 rounded-2xl border-2 p-4 text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
                 selectedReward === option.value
-                  ? 'border-amber-500 bg-amber-50 shadow-sm shadow-amber-100'
-                  : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+                  ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10 shadow-sm'
+                  : 'border-border bg-surface hover:border-border-strong hover:bg-surface-2'
               }`}
             >
               {selectedReward === option.value && (
@@ -149,12 +149,12 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
               <span className="text-2xl">{option.emoji}</span>
               <span
                 className={`text-sm font-semibold ${
-                  selectedReward === option.value ? 'text-amber-700' : 'text-gray-800'
+                  selectedReward === option.value ? 'text-amber-700 dark:text-amber-400' : 'text-fg'
                 }`}
               >
                 {t(option.labelKey)}
               </span>
-              <span className="text-xs text-gray-500 leading-snug">{t(option.descKey)}</span>
+              <span className="text-xs text-muted leading-snug">{t(option.descKey)}</span>
             </button>
           ))}
         </div>
@@ -162,7 +162,7 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
 
       {/* Reward description */}
       <div className="space-y-1.5">
-        <label htmlFor="rewardDescription" className="text-sm font-medium text-gray-700">
+        <label htmlFor="rewardDescription" className="text-sm font-medium text-fg">
           {selectedReward === 'custom' ? t('rewardDescLabelCustom') : t('rewardDescLabel')}
         </label>
         <textarea
@@ -172,13 +172,13 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
           defaultValue={existingProgram?.rewardDescription ?? ''}
           placeholder={placeholderMap[selectedReward]}
           required
-          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm transition-colors hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 resize-none bg-white"
+          className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-fg transition-colors hover:border-border-strong focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 resize-none bg-surface placeholder:text-muted"
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">
+        <div className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600 dark:bg-red-950/40 dark:border-red-900/50 dark:text-red-400">
           {error}
         </div>
       )}

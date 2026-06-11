@@ -20,7 +20,7 @@ export function MobileBottomNav() {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             className={`relative flex-1 flex flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium transition-colors duration-150 ${
-              active ? 'text-amber-600' : 'text-stone-400 hover:text-stone-600'
+              active ? 'text-amber-600' : 'text-muted hover:text-fg'
             }`}
           >
             <Icon className="w-5 h-5" strokeWidth={active ? 2.4 : 2} />

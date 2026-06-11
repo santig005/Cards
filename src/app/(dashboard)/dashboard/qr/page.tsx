@@ -38,13 +38,13 @@ export default async function QRPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-500 text-sm mt-1">{t('subtitleNoProgram')}</p>
+          <h1 className="text-2xl font-bold text-fg">{t('title')}</h1>
+          <p className="text-muted text-sm mt-1">{t('subtitleNoProgram')}</p>
         </div>
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
-          <h2 className="font-semibold text-gray-800">{t('configFirst')}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="font-semibold text-fg">{t('configFirst')}</h2>
+          <p className="text-sm text-muted">
             {t('configFirstBody')}
           </p>
           <Link href="/dashboard/onboarding">
@@ -58,27 +58,27 @@ export default async function QRPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-        <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-fg">{t('title')}</h1>
+        <p className="text-muted text-sm mt-1">{t('subtitle')}</p>
       </div>
 
       <div className="max-w-md mx-auto">
-        <Card padding="lg" className="border-amber-100 shadow-xl shadow-amber-50">
+        <Card padding="lg" className="border-amber-100 dark:border-amber-500/20">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-1.5">
+            <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-full px-4 py-1.5">
               <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shrink-0" />
-              <span className="text-sm font-semibold text-amber-700">{tenant!.name}</span>
+              <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{tenant!.name}</span>
             </div>
           </div>
           <QRDisplay url={clientUrl} tenantName={tenant!.name} />
         </Card>
 
-        <div className="mt-4 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
+        <div className="mt-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">🏅</span>
           <div className="text-sm">
-            <span className="font-semibold text-amber-800">{t('stampsToWin', { count: program.stampsRequired })}</span>
-            <span className="text-amber-700"> {t('toWin')} </span>
-            <span className="text-amber-700">{program.rewardDescription}</span>
+            <span className="font-semibold text-amber-800 dark:text-amber-300">{t('stampsToWin', { count: program.stampsRequired })}</span>
+            <span className="text-amber-700 dark:text-amber-400"> {t('toWin')} </span>
+            <span className="text-amber-700 dark:text-amber-400">{program.rewardDescription}</span>
           </div>
         </div>
 
@@ -90,7 +90,7 @@ export default async function QRPage() {
 
         <div className="mt-4 text-center">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">{t('backToDashboard')}</Button>
+            <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700 dark:text-amber-400">{t('backToDashboard')}</Button>
           </Link>
         </div>
       </div>

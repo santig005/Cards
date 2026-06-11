@@ -66,25 +66,25 @@ export default async function OnboardingPage() {
                       ? 'bg-amber-500 text-stone-950 shadow-sm shadow-amber-300'
                       : i === 0
                       ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 text-gray-400'
+                      : 'bg-surface-2 text-muted'
                   }`}
                 >
                   {i === 0 ? '✓' : i + 1}
                 </div>
                 <span
                   className={`text-xs font-medium hidden sm:block ${
-                    i === 1 ? 'text-amber-700' : i === 0 ? 'text-emerald-600' : 'text-gray-400'
+                    i === 1 ? 'text-amber-700 dark:text-amber-400' : i === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted'
                   }`}
                 >
                   {step}
                 </span>
-                {i < 2 && <div className="w-8 h-px bg-gray-200 mx-1" />}
+                {i < 2 && <div className="w-8 h-px bg-border mx-1" />}
               </div>
             ))}
           </div>
         )}
 
-        <Card padding="lg" className="shadow-xl shadow-amber-100/50 border-amber-100">
+        <Card padding="lg" className="border-amber-100 dark:border-amber-500/20">
           <OnboardingForm
             defaultBusinessName={tenant.name}
             defaultLogoUrl={tenant.logoUrl ?? undefined}
@@ -92,7 +92,7 @@ export default async function OnboardingPage() {
           />
         </Card>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-muted mt-6">
           {t('changeLater')}
         </p>
       </div>

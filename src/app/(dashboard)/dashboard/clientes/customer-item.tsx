@@ -66,24 +66,24 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
   return (
     <Card padding="md" className={`hover:shadow-md transition-all duration-150 ${staggerClass}`}>
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center shrink-0">
-          <span className="text-amber-700 font-bold text-sm">{displayName.charAt(0).toUpperCase()}</span>
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-500/20 dark:to-amber-500/10 flex items-center justify-center shrink-0">
+          <span className="text-amber-700 dark:text-amber-400 font-bold text-sm">{displayName.charAt(0).toUpperCase()}</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <p className="font-semibold text-gray-900 truncate">{displayName}</p>
-            <span className="text-xs font-medium text-gray-500 shrink-0">
+            <p className="font-semibold text-fg truncate">{displayName}</p>
+            <span className="text-xs font-medium text-muted shrink-0">
               {t('stampsOf', { current: currentStamps, required: stampsRequired })}
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-surface-2 rounded-full h-2 overflow-hidden">
             <div
               className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
           {customer.totalRedeemed != null && customer.totalRedeemed > 0 && (
-            <p className="text-xs text-emerald-600 mt-1">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
               {t('redemptionsTotal', { count: customer.totalRedeemed })}
             </p>
           )}
@@ -94,7 +94,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
             href={`/dashboard/clientes/${customer.customerId}`}
             aria-label="Ver detalle del cliente"
             title="Ver detalle"
-            className="w-8 h-8 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg text-muted hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors flex items-center justify-center"
           >
             <Eye className="w-4 h-4" />
           </Link>
@@ -106,7 +106,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
             }}
             aria-label="Editar cliente"
             title="Editar"
-            className="w-8 h-8 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg text-muted hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors flex items-center justify-center"
           >
             <Pencil className="w-4 h-4" />
           </button>
@@ -117,13 +117,13 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               stampsRequired={stampsRequired}
             />
           ) : (
-            <span className="text-xs text-gray-400">{t('noCard')}</span>
+            <span className="text-xs text-muted">{t('noCard')}</span>
           )}
         </div>
       </div>
 
       {editing && (
-        <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+        <div className="mt-4 pt-4 border-t border-border space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               label={t('nameLabel')}
@@ -141,9 +141,9 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               disabled={isPending}
             />
           </div>
-          <p className="text-xs text-gray-400">{t('phoneReadonly', { phone: customer.phone })}</p>
+          <p className="text-xs text-muted">{t('phoneReadonly', { phone: customer.phone })}</p>
 
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
 
           <div className="flex items-center justify-between gap-2">
             <Button
@@ -152,7 +152,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               size="sm"
               onClick={handleDelete}
               loading={isPending}
-              className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50"
+              className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
             >
               <Trash2 className="w-3.5 h-3.5" /> {t('delete')}
             </Button>

@@ -13,18 +13,18 @@ export default async function RegisterPage() {
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
             <span className="text-stone-950 text-sm font-bold">S</span>
           </div>
-          <span className="font-bold text-gray-900">Sellio</span>
+          <span className="font-bold text-fg">Sellio</span>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900">{t('registerTitle')}</h2>
-        <p className="text-gray-500 text-sm mt-1">
+        <h2 className="text-2xl font-bold text-fg">{t('registerTitle')}</h2>
+        <p className="text-muted text-sm mt-1">
           {t('registerSubtitle')}
         </p>
       </div>
 
       <RegisterForm />
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-muted mt-6">
         {t('haveAccount')}{' '}
         <Link href="/login" className="text-amber-600 font-semibold hover:text-amber-700">
           {t('loginLink')}
