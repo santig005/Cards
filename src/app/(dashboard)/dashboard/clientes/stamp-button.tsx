@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { addStamp, redeemReward, undoLastStamp } from './actions'
+import { fireConfetti } from '@/components/features/confetti-trigger'
 
 interface StampButtonProps {
   cardId: string
@@ -51,6 +52,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
         flash({ message: result.error, type: 'error' })
       } else {
         flash({ message: t('toastRewardDelivered', { reward: result.rewardDescription }), type: 'redeem' })
+        fireConfetti()
       }
     })
   }
