@@ -25,7 +25,7 @@ export function LocaleSwitcher({ className = '', variant = 'dark' }: LocaleSwitc
 
   const variantClass =
     variant === 'light'
-      ? 'border border-stone-300 bg-white text-stone-700 focus:ring-amber-500/40'
+      ? 'border border-border bg-surface text-fg focus:ring-amber-500/40'
       : 'border border-white/15 bg-white/5 text-stone-300 focus:ring-amber-500/40'
 
   return (
@@ -37,7 +37,7 @@ export function LocaleSwitcher({ className = '', variant = 'dark' }: LocaleSwitc
       className={`rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 ${variantClass} ${className}`}
     >
       {locales.map((l) => (
-        <option key={l} value={l} className="text-stone-900">
+        <option key={l} value={l}>
           {localeNames[l]}
         </option>
       ))}

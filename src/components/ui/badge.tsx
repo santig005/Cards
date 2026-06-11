@@ -7,10 +7,10 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const variants: Record<Variant, string> = {
-  default: 'bg-stone-100 text-stone-700',
-  success: 'bg-emerald-100 text-emerald-700',
-  warning: 'bg-amber-100 text-amber-700',
-  danger:  'bg-red-100 text-red-600',
+  default: 'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300',
+  success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+  warning: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
+  danger:  'bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-400',
   gold:    'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950',
   dark:    'bg-stone-900 text-amber-400 border border-amber-500/20',
 }

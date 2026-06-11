@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { logout } from '@/app/(auth)/actions'
 import { NAV_ITEMS, isNavActive } from './nav-items'
 import { LocaleSwitcher } from './locale-switcher'
+import { ThemeToggle } from './theme-toggle'
 
 interface SidebarNavProps {
   tenantName: string
@@ -21,15 +22,18 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-surface border-r border-border min-h-screen sticky top-0 h-screen">
       {/* Logo / Brand */}
-      <div className="py-5 px-5 border-b border-border">
+      <div className="py-5 px-5 border-b border-border space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)] shrink-0">
             <span className="text-stone-950 font-bold text-base">S</span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-stone-900 text-sm leading-tight truncate">{tenantName}</p>
-            <p className="text-xs text-stone-500 truncate">{userEmail}</p>
+            <p className="font-semibold text-fg text-sm leading-tight truncate">{tenantName}</p>
+            <p className="text-xs text-muted truncate">{userEmail}</p>
           </div>
+        </div>
+        <div className="flex items-center justify-end gap-1">
+          <ThemeToggle />
           <LocaleSwitcher variant="light" />
         </div>
       </div>
@@ -46,8 +50,8 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
               aria-current={active ? 'page' : undefined}
               className={`relative flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-150 ${
                 active
-                  ? 'bg-amber-50 text-amber-700'
-                  : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
+                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400'
+                  : 'text-muted hover:bg-surface-2 hover:text-fg'
               }`}
             >
               {active && (
@@ -61,13 +65,13 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
       </nav>
 
       {/* Plan badge */}
-      <div className="mx-3 mb-3 rounded-xl bg-amber-50 border border-amber-200/70 px-3 py-2 flex items-center gap-2">
+      <div className="mx-3 mb-3 rounded-xl bg-amber-50 border border-amber-200/70 px-3 py-2 flex items-center gap-2 dark:bg-amber-500/10 dark:border-amber-500/20">
         <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-stone-950 text-xs shrink-0">
           ✦
         </div>
         <div>
-          <p className="text-xs font-semibold text-amber-700 leading-tight">{ts('planName')}</p>
-          <p className="text-[10px] text-amber-600/80">{ts('planSubtitle')}</p>
+          <p className="text-xs font-semibold text-amber-700 leading-tight dark:text-amber-400">{ts('planName')}</p>
+          <p className="text-[10px] text-amber-600/80 dark:text-amber-500/80">{ts('planSubtitle')}</p>
         </div>
       </div>
 
@@ -76,7 +80,7 @@ export function SidebarNav({ tenantName, userEmail }: SidebarNavProps) {
         <form action={logout}>
           <button
             type="submit"
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-stone-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted hover:bg-red-50 hover:text-red-600 transition-colors duration-150 dark:hover:bg-red-950/40 dark:hover:text-red-400"
           >
             <LogOut className="w-[18px] h-[18px] shrink-0" strokeWidth={2} />
             {ts('logout')}

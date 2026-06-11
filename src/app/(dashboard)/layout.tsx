@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm'
 import { SidebarNav } from '@/components/features/sidebar-nav'
 import { MobileBottomNav } from '@/components/features/mobile-bottom-nav'
 import { LocaleSwitcher } from '@/components/features/locale-switcher'
+import { ThemeToggle } from '@/components/features/theme-toggle'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -34,11 +35,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)]">
               <span className="text-stone-950 text-xs font-bold">S</span>
             </div>
-            <span className="font-bold text-gray-900 text-sm">Sellio</span>
+            <span className="font-bold text-fg text-sm">Sellio</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle />
             <LocaleSwitcher variant="light" />
-            <span className="text-xs text-gray-400 truncate max-w-[120px]">{user.email}</span>
           </div>
         </header>
 

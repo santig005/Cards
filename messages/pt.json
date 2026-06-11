@@ -1,6 +1,8 @@
 {
   "common": {
-    "language": "Idioma"
+    "language": "Idioma",
+    "lightMode": "Modo claro",
+    "darkMode": "Modo escuro"
   },
   "customer": {
     "notFoundTitle": "Negócio não encontrado",

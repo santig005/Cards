@@ -1,4 +1,6 @@
 import { getTranslations } from 'next-intl/server'
+import { ThemeToggle } from '@/components/features/theme-toggle'
+import { LocaleSwitcher } from '@/components/features/locale-switcher'
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations('auth')
@@ -70,7 +72,11 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 bg-white flex flex-col items-center justify-center p-8 md:p-12">
+      <div className="flex-1 bg-surface flex flex-col items-center justify-center p-8 md:p-12 relative">
+        <div className="absolute top-4 right-4 flex items-center gap-1.5">
+          <ThemeToggle />
+          <LocaleSwitcher variant="light" />
+        </div>
         {children}
       </div>
     </div>

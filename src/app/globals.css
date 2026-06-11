@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Variante dark por clase .dark en <html> (toggle manual + default por SO).
+   Habilita las utilidades `dark:` además de overridear los tokens de abajo. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ─── Tokens semánticos (Tailwind v4 @theme → generan utilidades) ───────────── */
 /* Neutrales cálidos por ROL (no por valor) + marca + elevación. Esto es lo que
    hace que la UI se sienta "de sistema" y no ad-hoc. Lightness en OKLCH para
@@ -17,6 +21,43 @@
   --color-brand:         oklch(0.78 0.16 75);
   --color-brand-600:     oklch(0.70 0.15 62);
   /* Elevación — misma fuente de luz, blur consistente, tinte cálido */
+  --shadow-e1: 0 1px 2px rgb(28 25 23 / 0.04), 0 2px 6px -2px rgb(28 25 23 / 0.07);
+  --shadow-e2: 0 4px 14px -3px rgb(28 25 23 / 0.10);
+  --shadow-e3: 0 16px 40px -10px rgb(28 25 23 / 0.18);
+}
+
+/* ─── Modo noche — overrides de tokens (OKLCH cálido, no negro puro) ─────────── */
+/* Solo aplica al panel/auth (que usan tokens semánticos). El flujo del cliente
+   ya es oscuro por diseño y no usa estos tokens. */
+.dark {
+  color-scheme: dark; /* desplegables/scrollbars/date pickers nativos en oscuro */
+  --color-bg:            oklch(0.155 0.008 60);  /* fondo, marrón-gris cálido */
+  --color-surface:       oklch(0.195 0.009 60);  /* cards, +L que bg */
+  --color-surface-2:     oklch(0.140 0.007 60);  /* hundido (inputs, tiles) */
+  --color-border:        oklch(0.285 0.010 60);  /* visible, no estridente */
+  --color-border-strong: oklch(0.360 0.012 60);
+  --color-fg:            oklch(0.920 0.010 80);  /* off-white cálido (~AAA) */
+  --color-muted:         oklch(0.640 0.018 75);  /* secundario (~AA) */
+  /* Marca ámbar se mantiene: luce bien sobre oscuro. */
+
+  /* Sombras: en oscuro pesan menos, base negra */
+  --shadow-e1: 0 1px 3px rgb(0 0 0 / 0.25), 0 2px 8px -2px rgb(0 0 0 / 0.35);
+  --shadow-e2: 0 4px 16px -3px rgb(0 0 0 / 0.45);
+  --shadow-e3: 0 16px 48px -10px rgb(0 0 0 / 0.60);
+}
+
+/* El flujo del cliente tiene su tema fijo (oscuro por diseño); reseteamos los
+   tokens a sus valores claros aunque el documento esté en .dark, para que los
+   componentes basados en tokens (Input/Card) no se contaminen ahí. */
+.force-light {
+  color-scheme: light;
+  --color-bg:            oklch(0.985 0.004 95);
+  --color-surface:       oklch(1 0 0);
+  --color-surface-2:     oklch(0.975 0.005 95);
+  --color-border:        oklch(0.905 0.006 95);
+  --color-border-strong: oklch(0.85 0.008 95);
+  --color-fg:            oklch(0.24 0.01 60);
+  --color-muted:         oklch(0.55 0.012 60);
   --shadow-e1: 0 1px 2px rgb(28 25 23 / 0.04), 0 2px 6px -2px rgb(28 25 23 / 0.07);
   --shadow-e2: 0 4px 14px -3px rgb(28 25 23 / 0.10);
   --shadow-e3: 0 16px 40px -10px rgb(28 25 23 / 0.18);
