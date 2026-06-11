@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect } from 'react'
-import confetti from 'canvas-confetti'
 
-function burst() {
+async function burst() {
+  const { default: confetti } = await import('canvas-confetti')
   confetti({ particleCount: 70, spread: 55, angle: 60, origin: { x: 0, y: 0.65 } })
   confetti({ particleCount: 70, spread: 55, angle: 120, origin: { x: 1, y: 0.65 } })
 }
