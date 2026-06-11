@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { addStamp, redeemReward, undoLastStamp } from './actions'
 
@@ -13,6 +14,7 @@ interface StampButtonProps {
 type Toast = { message: string; type: 'success' | 'redeem' | 'error' }
 
 export function StampButton({ cardId, currentStamps, stampsRequired }: StampButtonProps) {
+  const t = useTranslations('customerItem')
   const [isPending, startTransition] = useTransition()
   const [toast, setToast] = useState<Toast | null>(null)
   const [canUndo, setCanUndo] = useState(false)
@@ -20,8 +22,8 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
   const isFull = currentStamps >= stampsRequired
   const remaining = stampsRequired - currentStamps
 
-  function flash(t: Toast, withUndo = false) {
-    setToast(t)
+  function flash(toastData: Toast, withUndo = false) {
+    setToast(toastData)
     setCanUndo(withUndo)
     setTimeout(() => {
       setToast(null)
@@ -35,9 +37,9 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
       if ('error' in result) {
         flash({ message: result.error, type: 'error' })
       } else if (result.full) {
-        flash({ message: '✨ ¡Tarjeta completa! Lista para canjear', type: 'redeem' }, true)
+        flash({ message: t('toastCardFull'), type: 'redeem' }, true)
       } else {
-        flash({ message: '✅ Sello registrado', type: 'success' }, true)
+        flash({ message: t('toastStampAdded'), type: 'success' }, true)
       }
     })
   }
@@ -48,7 +50,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
       if ('error' in result) {
         flash({ message: result.error, type: 'error' })
       } else {
-        flash({ message: `🎉 Premio entregado: ${result.rewardDescription}`, type: 'redeem' })
+        flash({ message: t('toastRewardDelivered', { reward: result.rewardDescription }), type: 'redeem' })
       }
     })
   }
@@ -59,7 +61,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
       flash(
         'error' in result
           ? { message: result.error, type: 'error' }
-          : { message: '↩️ Sello deshecho', type: 'success' }
+          : { message: t('toastUndone'), type: 'success' }
       )
     })
   }
@@ -74,7 +76,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
           onClick={handleRedeem}
           className="shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white"
         >
-          🎁 Canjear
+          {t('redeem')}
         </Button>
       ) : (
         <Button
@@ -84,7 +86,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
           onClick={handleAddStamp}
           className="shrink-0"
         >
-          {remaining === 1 ? '🎁 Último sello' : '+1 Sello'}
+          {remaining === 1 ? t('lastStamp') : t('addStamp')}
         </Button>
       )}
 
@@ -106,7 +108,7 @@ export function StampButton({ cardId, currentStamps, stampsRequired }: StampButt
               disabled={isPending}
               className="underline underline-offset-2 hover:opacity-70 disabled:opacity-50"
             >
-              Deshacer
+              {t('undo')}
             </button>
           )}
         </div>

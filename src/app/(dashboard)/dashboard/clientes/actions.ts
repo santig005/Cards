@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
@@ -31,21 +32,22 @@ type AddStampResult =
 export async function addStamp(cardId: string): Promise<AddStampResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autorizado' }
+  const t = await getTranslations('errors')
+  if (!user) return { error: t('unauthorized') }
 
   const result = await withAuth(user.id, async (tx): Promise<AddStampResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
-    if (!card || card.tenantId !== tenant.id) return { error: 'Tarjeta no encontrada' }
+    if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
     const [program] = await tx
       .select()
       .from(loyaltyPrograms)
       .where(eq(loyaltyPrograms.id, card.programId))
       .limit(1)
-    if (!program) return { error: 'Programa no encontrado' }
+    if (!program) return { error: t('programNotFound') }
 
     // Cooldown sobre el último sello de esta tarjeta.
     const [lastStamp] = await tx
@@ -56,12 +58,12 @@ export async function addStamp(cardId: string): Promise<AddStampResult> {
       .limit(1)
 
     if (isWithinCooldown(lastStamp?.createdAt ?? null, new Date(), STAMP_COOLDOWN_MS)) {
-      return { error: 'Esperá unos segundos antes de registrar otro sello.' }
+      return { error: t('cooldown') }
     }
 
     const outcome = applyStamp(card.currentStamps, program.stampsRequired)
     if (!outcome.ok) {
-      return { error: 'La tarjeta ya está completa. Registrá el canje del premio.' }
+      return { error: t('cardAlreadyFull') }
     }
 
     await tx
@@ -92,24 +94,25 @@ type RedeemResult = { error: string } | { success: true; rewardDescription: stri
 export async function redeemReward(cardId: string): Promise<RedeemResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autorizado' }
+  const t = await getTranslations('errors')
+  if (!user) return { error: t('unauthorized') }
 
   const result = await withAuth(user.id, async (tx): Promise<RedeemResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
-    if (!card || card.tenantId !== tenant.id) return { error: 'Tarjeta no encontrada' }
+    if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
     const [program] = await tx
       .select()
       .from(loyaltyPrograms)
       .where(eq(loyaltyPrograms.id, card.programId))
       .limit(1)
-    if (!program) return { error: 'Programa no encontrado' }
+    if (!program) return { error: t('programNotFound') }
 
     if (!canRedeem(card.currentStamps, program.stampsRequired)) {
-      return { error: 'La tarjeta todavía no está completa.' }
+      return { error: t('cardNotFull') }
     }
 
     await tx
@@ -137,16 +140,17 @@ type UndoResult = { error: string } | { success: true; stamps: number }
 export async function undoLastStamp(cardId: string): Promise<UndoResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autorizado' }
+  const t = await getTranslations('errors')
+  if (!user) return { error: t('unauthorized') }
 
   const result = await withAuth(user.id, async (tx): Promise<UndoResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
-    if (!card || card.tenantId !== tenant.id) return { error: 'Tarjeta no encontrada' }
+    if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
-    if (card.currentStamps <= 0) return { error: 'No hay sellos para deshacer.' }
+    if (card.currentStamps <= 0) return { error: t('noStampsToUndo') }
 
     const [last] = await tx
       .select()
@@ -155,9 +159,9 @@ export async function undoLastStamp(cardId: string): Promise<UndoResult> {
       .orderBy(desc(stampEvents.createdAt))
       .limit(1)
 
-    if (!last) return { error: 'No hay sellos para deshacer.' }
+    if (!last) return { error: t('noStampsToUndo') }
     if (Date.now() - last.createdAt.getTime() > UNDO_WINDOW_MS) {
-      return { error: 'Ya pasó el tiempo para deshacer este sello.' }
+      return { error: t('undoWindowExpired') }
     }
 
     await tx.delete(stampEvents).where(eq(stampEvents.id, last.id))
@@ -189,7 +193,8 @@ export async function updateCustomer(
 ): Promise<UpdateCustomerResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autorizado' }
+  const t = await getTranslations('errors')
+  if (!user) return { error: t('unauthorized') }
 
   const parsed = updateCustomerSchema.safeParse(input)
   if (!parsed.success) {
@@ -198,11 +203,11 @@ export async function updateCustomer(
 
   const result = await withAuth(user.id, async (tx): Promise<UpdateCustomerResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
     // RLS ya aísla por tenant; este check es defensa en profundidad.
-    if (!customer || customer.tenantId !== tenant.id) return { error: 'Cliente no encontrado' }
+    if (!customer || customer.tenantId !== tenant.id) return { error: t('customerNotFound') }
 
     await tx
       .update(customers)
@@ -225,14 +230,15 @@ type DeleteCustomerResult = { error: string } | { success: true }
 export async function deleteCustomer(customerId: string): Promise<DeleteCustomerResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'No autorizado' }
+  const t = await getTranslations('errors')
+  if (!user) return { error: t('unauthorized') }
 
   const result = await withAuth(user.id, async (tx): Promise<DeleteCustomerResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
-    if (!customer || customer.tenantId !== tenant.id) return { error: 'Cliente no encontrado' }
+    if (!customer || customer.tenantId !== tenant.id) return { error: t('customerNotFound') }
 
     // No hay FKs con cascade en el schema → borramos en orden manualmente,
     // siempre acotado por tenant (defensa en profundidad sobre RLS).

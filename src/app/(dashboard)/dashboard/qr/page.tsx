@@ -1,5 +1,6 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
@@ -13,6 +14,8 @@ export default async function QRPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  const t = await getTranslations('qr')
 
   const result = await withAuth(user.id, async (tx) => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -35,17 +38,17 @@ export default async function QRPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mi QR</h1>
-          <p className="text-gray-500 text-sm mt-1">Código QR para tus clientes</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('subtitleNoProgram')}</p>
         </div>
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
-          <h2 className="font-semibold text-gray-800">Configurá tu programa primero</h2>
+          <h2 className="font-semibold text-gray-800">{t('configFirst')}</h2>
           <p className="text-sm text-gray-500">
-            Antes de ver tu QR, configurá tu programa de fidelización.
+            {t('configFirstBody')}
           </p>
           <Link href="/dashboard/onboarding">
-            <Button size="md">Configurar programa</Button>
+            <Button size="md">{t('configCta')}</Button>
           </Link>
         </Card>
       </div>
@@ -55,8 +58,8 @@ export default async function QRPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Mi QR</h1>
-        <p className="text-gray-500 text-sm mt-1">Compartí este código con tus clientes</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
       </div>
 
       <div className="max-w-md mx-auto">
@@ -73,21 +76,21 @@ export default async function QRPage() {
         <div className="mt-4 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">🏅</span>
           <div className="text-sm">
-            <span className="font-semibold text-amber-800">{program.stampsRequired} sellos</span>
-            <span className="text-amber-700"> para ganar: </span>
+            <span className="font-semibold text-amber-800">{t('stampsToWin', { count: program.stampsRequired })}</span>
+            <span className="text-amber-700"> {t('toWin')} </span>
             <span className="text-amber-700">{program.rewardDescription}</span>
           </div>
         </div>
 
         <Link href="/dashboard/qr/poster" className="block mt-4">
           <Button size="lg" className="w-full gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
-            🖨️ Generar afiche imprimible
+            {t('generatePoster')}
           </Button>
         </Link>
 
         <div className="mt-4 text-center">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">← Volver al dashboard</Button>
+            <Button variant="ghost" size="sm" className="text-amber-600 hover:text-amber-700">{t('backToDashboard')}</Button>
           </Link>
         </div>
       </div>

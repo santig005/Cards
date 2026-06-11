@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,6 +28,7 @@ interface CustomerItemProps {
 }
 
 export function CustomerItem({ customer, stampsRequired, index }: CustomerItemProps) {
+  const t = useTranslations('customerItem')
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(customer.name ?? '')
   const [email, setEmail] = useState(customer.email ?? '')
@@ -49,9 +51,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
 
   function handleDelete() {
     if (
-      !window.confirm(
-        `¿Eliminar a ${displayName}? Se borran sus sellos y tarjetas. Esta acción no se puede deshacer.`
-      )
+      !window.confirm(t('confirmDelete', { name: displayName }))
     ) {
       return
     }
@@ -73,7 +73,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
           <div className="flex items-center justify-between gap-2 mb-1">
             <p className="font-semibold text-gray-900 truncate">{displayName}</p>
             <span className="text-xs font-medium text-gray-500 shrink-0">
-              {currentStamps}/{stampsRequired} sellos
+              {t('stampsOf', { current: currentStamps, required: stampsRequired })}
             </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -84,8 +84,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
           </div>
           {customer.totalRedeemed != null && customer.totalRedeemed > 0 && (
             <p className="text-xs text-emerald-600 mt-1">
-              🎁 {customer.totalRedeemed} canje{customer.totalRedeemed !== 1 ? 's' : ''} total
-              {customer.totalRedeemed !== 1 ? 'es' : ''}
+              {t('redemptionsTotal', { count: customer.totalRedeemed })}
             </p>
           )}
         </div>
@@ -118,7 +117,7 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               stampsRequired={stampsRequired}
             />
           ) : (
-            <span className="text-xs text-gray-400">Sin tarjeta</span>
+            <span className="text-xs text-gray-400">{t('noCard')}</span>
           )}
         </div>
       </div>
@@ -127,22 +126,22 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
         <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Nombre"
+              label={t('nameLabel')}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nombre del cliente"
+              placeholder={t('namePlaceholder')}
               disabled={isPending}
             />
             <Input
-              label="Email"
+              label={t('emailLabel')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="cliente@email.com"
+              placeholder={t('emailPlaceholder')}
               disabled={isPending}
             />
           </div>
-          <p className="text-xs text-gray-400">Teléfono: {customer.phone} (no editable)</p>
+          <p className="text-xs text-gray-400">{t('phoneReadonly', { phone: customer.phone })}</p>
 
           {error && <p className="text-xs text-red-500">{error}</p>}
 
@@ -155,14 +154,14 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               loading={isPending}
               className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50"
             >
-              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+              <Trash2 className="w-3.5 h-3.5" /> {t('delete')}
             </Button>
             <div className="flex gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)} disabled={isPending}>
-                Cancelar
+                {t('cancel')}
               </Button>
               <Button type="button" size="sm" onClick={handleSave} loading={isPending}>
-                Guardar
+                {t('save')}
               </Button>
             </div>
           </div>

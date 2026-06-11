@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { QRCodeSVG } from 'qrcode.react'
 
 interface QRDisplayProps {
@@ -9,6 +10,7 @@ interface QRDisplayProps {
 }
 
 export function QRDisplay({ url, tenantName }: QRDisplayProps) {
+  const t = useTranslations('qr')
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -41,7 +43,7 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
         <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
           <span className="text-base">📲</span>
         </div>
-        <p className="text-sm font-medium text-gray-600">Mostrá este QR en tu negocio</p>
+        <p className="text-sm font-medium text-gray-600">{t('showQr')}</p>
       </div>
 
       {/* QR Code */}
@@ -69,7 +71,7 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
               : 'bg-amber-500 text-stone-950 hover:bg-amber-400'
           }`}
         >
-          {copied ? '✓' : 'Copiar'}
+          {copied ? t('copied') : t('copyLink')}
         </button>
       </div>
 
@@ -78,7 +80,7 @@ export function QRDisplay({ url, tenantName }: QRDisplayProps) {
         onClick={handleDownload}
         className="flex items-center gap-2 text-sm text-gray-500 hover:text-amber-600 transition-colors underline underline-offset-4"
       >
-        ⬇️ Descargar QR como SVG
+        {t('downloadSvg')}
       </button>
     </div>
   )

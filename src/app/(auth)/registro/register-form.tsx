@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import { useTranslations } from 'next-intl'
 import { register } from '../actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +41,7 @@ const LockIcon = (
 )
 
 export function RegisterForm() {
+  const t = useTranslations('auth')
   const [state, action, pending] = useActionState(
     async (_: unknown, formData: FormData) => register(formData),
     null as { error?: string; success?: string } | null
@@ -53,7 +55,7 @@ export function RegisterForm() {
             <path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="font-semibold text-gray-900">¡Casi listo!</p>
+        <p className="font-semibold text-gray-900">{t('almostReady')}</p>
         <p className="text-sm text-gray-500">{state.success}</p>
       </div>
     )
@@ -64,27 +66,27 @@ export function RegisterForm() {
       <Input
         name="businessName"
         type="text"
-        label="Nombre del negocio"
+        label={t('businessNameLabel')}
         required
-        placeholder="Ej: Café El Rincón"
+        placeholder={t('businessNamePlaceholder')}
         icon={StoreIcon}
       />
       <Input
         name="email"
         type="email"
-        label="Email"
+        label={t('emailLabel')}
         required
         autoComplete="email"
-        placeholder="tu@negocio.com"
+        placeholder={t('emailPlaceholder')}
         icon={EmailIcon}
       />
       <Input
         name="password"
         type="password"
-        label="Contraseña"
+        label={t('passwordLabel')}
         required
         autoComplete="new-password"
-        placeholder="Mínimo 8 caracteres"
+        placeholder={t('newPasswordPlaceholder')}
         icon={LockIcon}
       />
 
@@ -104,11 +106,11 @@ export function RegisterForm() {
         loading={pending}
         className="w-full mt-2"
       >
-        Crear cuenta gratis →
+        {t('registerCta')}
       </Button>
 
       <p className="text-center text-xs text-gray-400 mt-3">
-        ✓ Sin tarjeta de crédito · ✓ Cancelás cuando quieras
+        {t('registerNoCard')}
       </p>
     </form>
   )

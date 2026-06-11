@@ -5,6 +5,7 @@ import { tenants } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { SidebarNav } from '@/components/features/sidebar-nav'
 import { MobileBottomNav } from '@/components/features/mobile-bottom-nav'
+import { LocaleSwitcher } from '@/components/features/locale-switcher'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -35,7 +36,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
             <span className="font-bold text-gray-900 text-sm">Sellio</span>
           </div>
-          <span className="text-xs text-gray-400 truncate max-w-[160px]">{user.email}</span>
+          <div className="flex items-center gap-3">
+            <LocaleSwitcher variant="light" />
+            <span className="text-xs text-gray-400 truncate max-w-[120px]">{user.email}</span>
+          </div>
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto pb-20 lg:pb-0">

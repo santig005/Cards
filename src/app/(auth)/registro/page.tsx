@@ -1,7 +1,10 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { RegisterForm } from './register-form'
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const t = await getTranslations('auth')
+
   return (
     <div className="w-full max-w-sm animate-fade-up">
       <div className="mb-8">
@@ -13,18 +16,18 @@ export default function RegisterPage() {
           <span className="font-bold text-gray-900">Sellio</span>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900">Empezá gratis hoy</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('registerTitle')}</h2>
         <p className="text-gray-500 text-sm mt-1">
-          Configurá tu programa en menos de 2 minutos
+          {t('registerSubtitle')}
         </p>
       </div>
 
       <RegisterForm />
 
       <p className="text-center text-sm text-gray-500 mt-6">
-        ¿Ya tenés cuenta?{' '}
+        {t('haveAccount')}{' '}
         <Link href="/login" className="text-amber-600 font-semibold hover:text-amber-700">
-          Iniciá sesión →
+          {t('loginLink')}
         </Link>
       </p>
     </div>

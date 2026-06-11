@@ -1,5 +1,6 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, stampEvents, loyaltyCards } from '@/lib/drizzle/schema'
@@ -15,6 +16,8 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  const t = await getTranslations('dashboard')
 
   const data = await withAuth(user.id, async (tx) => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -119,10 +122,10 @@ export default async function DashboardPage() {
   const maxDay = analytics ? Math.max(1, ...analytics.byDay.map((d) => d.count)) : 1
 
   const REWARD_LABELS: Record<string, string> = {
-    free_product: '🎁 Producto gratis',
-    discount_percent: '💰 Descuento (%)',
-    two_for_one: '2️⃣ 2x1',
-    custom: '✏️ Personalizado',
+    free_product: t('rewardFreeProduct'),
+    discount_percent: t('rewardDiscountPercent'),
+    two_for_one: t('rewardTwoForOne'),
+    custom: t('rewardCustom'),
   }
 
   return (
@@ -131,9 +134,9 @@ export default async function DashboardPage() {
         <div>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight text-stone-900">{tenant!.name}</h1>
-            <Badge variant="gold">Activo</Badge>
+            <Badge variant="gold">{t('active')}</Badge>
           </div>
-          <p className="text-stone-500 text-sm mt-1">Bienvenido a tu panel de fidelización</p>
+          <p className="text-stone-500 text-sm mt-1">{t('welcome')}</p>
         </div>
       </div>
 
@@ -152,14 +155,13 @@ export default async function DashboardPage() {
             <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center mb-3">
               <Rocket className="w-6 h-6" strokeWidth={2} />
             </div>
-            <h2 className="text-xl font-bold mb-2">Configurá tu programa de fidelización</h2>
+            <h2 className="text-xl font-bold mb-2">{t('setupTitle')}</h2>
             <p className="text-amber-100 text-sm mb-6 max-w-md">
-              Aún no tenés un programa activo. Configurá las recompensas y comenzá a fidelizar
-              a tus clientes hoy mismo.
+              {t('setupBody')}
             </p>
             <Link href="/dashboard/onboarding">
               <Button variant="secondary" size="lg" className="bg-white text-amber-700 border-0 hover:bg-amber-50 shadow-lg">
-                Configurar mi programa →
+                {t('setupCta')}
               </Button>
             </Link>
           </div>
@@ -170,9 +172,9 @@ export default async function DashboardPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { label: 'Clientes', value: customerCount, Icon: Users, accent: 'bg-stone-100 text-stone-600', description: 'Total registrados' },
-              { label: 'Sellos dados', value: stampCount, Icon: Award, accent: 'bg-amber-100 text-amber-700', description: 'Acumulados' },
-              { label: 'Canjes', value: redeemCount, Icon: Gift, accent: 'bg-emerald-100 text-emerald-700', description: 'Recompensas entregadas' },
+              { label: t('statCustomers'), value: customerCount, Icon: Users, accent: 'bg-stone-100 text-stone-600', description: t('statCustomersDesc') },
+              { label: t('statStamps'), value: stampCount, Icon: Award, accent: 'bg-amber-100 text-amber-700', description: t('statStampsDesc') },
+              { label: t('statRedemptions'), value: redeemCount, Icon: Gift, accent: 'bg-emerald-100 text-emerald-700', description: t('statRedemptionsDesc') },
             ].map(({ label, value, Icon, accent, description }) => (
               <Card key={label} padding="md" className="card-hover">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${accent}`}>
@@ -189,16 +191,16 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
                 <p className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-1">
-                  Programa activo
+                  {t('activeProgram')}
                 </p>
                 <p className="font-semibold text-stone-800">
-                  {program.stampsRequired} sellos → {REWARD_LABELS[program.rewardType] ?? program.rewardType}
+                  {program.stampsRequired} {t('stampPlural')} → {REWARD_LABELS[program.rewardType] ?? program.rewardType}
                 </p>
                 <p className="text-sm text-stone-500 mt-0.5">{program.rewardDescription}</p>
               </div>
               <Link href="/dashboard/onboarding">
                 <Button variant="ghost" size="sm" className="gap-1.5 text-amber-600 hover:text-amber-700">
-                  <Pencil className="w-3.5 h-3.5" /> Editar
+                  <Pencil className="w-3.5 h-3.5" /> {t('edit')}
                 </Button>
               </Link>
             </div>
@@ -208,13 +210,13 @@ export default async function DashboardPage() {
             <Link href="/dashboard/qr" className="flex-1">
               <Button size="xl" className="w-full gap-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
                 <QrCode className="w-5 h-5" strokeWidth={2.2} />
-                <span>Ver mi QR</span>
+                <span>{t('viewQr')}</span>
               </Button>
             </Link>
             <Link href="/dashboard/clientes" className="flex-1">
               <Button variant="outline" size="xl" className="w-full gap-2.5">
                 <Users className="w-5 h-5" strokeWidth={2.2} />
-                <span>Registrar sello</span>
+                <span>{t('registerStamp')}</span>
               </Button>
             </Link>
           </div>
@@ -223,10 +225,10 @@ export default async function DashboardPage() {
             <Card padding="md" className="border-amber-100">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Actividad</p>
-                  <p className="font-semibold text-gray-800">Sellos últimos 7 días</p>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('analyticsTitle')}</p>
+                  <p className="font-semibold text-gray-800">{t('analyticsSubtitle')}</p>
                 </div>
-                <span className="text-sm font-medium text-amber-700">{weekTotal} esta semana</span>
+                <span className="text-sm font-medium text-amber-700">{t('thisWeek', { count: weekTotal })}</span>
               </div>
 
               <div className="flex items-end justify-between gap-2 h-28">
@@ -238,7 +240,7 @@ export default async function DashboardPage() {
                         <div
                           className="w-full max-w-[28px] rounded-t-md bg-gradient-to-t from-amber-400 to-amber-500 transition-all duration-300"
                           style={{ height: `${d.count > 0 ? Math.max(pct, 8) : 3}%` }}
-                          title={`${d.count} ${d.count === 1 ? 'sello' : 'sellos'}`}
+                          title={`${d.count} ${d.count === 1 ? t('stampSingular') : t('stampPlural')}`}
                         />
                       </div>
                       <span className="text-[10px] text-gray-400 tabular-nums">{d.count}</span>
@@ -251,15 +253,15 @@ export default async function DashboardPage() {
               <div className="grid grid-cols-3 gap-3 mt-5">
                 <div className="rounded-xl bg-stone-50 p-3">
                   <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.newCustomers7d}</p>
-                  <p className="text-xs text-gray-500">Clientes nuevos (7d)</p>
+                  <p className="text-xs text-gray-500">{t('newCustomers7d')}</p>
                 </div>
                 <div className="rounded-xl bg-stone-50 p-3">
                   <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.returningCount}</p>
-                  <p className="text-xs text-gray-500">Clientes recurrentes</p>
+                  <p className="text-xs text-gray-500">{t('returningCustomers')}</p>
                 </div>
                 <div className="rounded-xl bg-stone-50 p-3">
                   <p className="text-lg font-bold text-stone-800 tabular-nums">{analytics.redemptionRate}%</p>
-                  <p className="text-xs text-gray-500">Tasa de canje</p>
+                  <p className="text-xs text-gray-500">{t('redemptionRate')}</p>
                 </div>
               </div>
             </Card>

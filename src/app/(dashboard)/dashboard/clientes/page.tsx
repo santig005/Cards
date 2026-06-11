@@ -1,5 +1,6 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
@@ -13,6 +14,8 @@ export default async function ClientesPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/login')
+
+  const t = await getTranslations('customers')
 
   const base = await withAuth(user.id, async (tx) => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -32,17 +35,17 @@ export default async function ClientesPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clientes</h1>
-          <p className="text-gray-500 text-sm mt-1">Gestioná los sellos de tus clientes</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('subtitle')}</p>
         </div>
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
-          <h2 className="font-semibold text-gray-800">Configurá tu programa primero</h2>
+          <h2 className="font-semibold text-gray-800">{t('configFirst')}</h2>
           <p className="text-sm text-gray-500">
-            Antes de gestionar clientes, configurá tu programa de fidelización.
+            {t('configFirstBody')}
           </p>
           <Link href="/dashboard/onboarding">
-            <Button size="md">Configurar programa</Button>
+            <Button size="md">{t('configCta')}</Button>
           </Link>
         </Card>
       </div>
@@ -66,26 +69,29 @@ export default async function ClientesPage() {
       .where(eq(customers.tenantId, tenant.id))
   )
 
+  const count = customerList.length
+  const registeredLabel =
+    count === 1 ? t('registeredOne', { count }) : t('registeredOther', { count })
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clientes</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-gray-500 text-sm mt-1">
-            {customerList.length > 0
-              ? `${customerList.length} cliente${customerList.length !== 1 ? 's' : ''} registrado${customerList.length !== 1 ? 's' : ''}`
-              : 'Gestioná los sellos de tus clientes'}
+            {count > 0 ? registeredLabel : t('subtitle')}
           </p>
         </div>
         <Link href="/dashboard/qr">
-          <Button variant="secondary" size="sm">📱 Compartir QR</Button>
+          <Button variant="secondary" size="sm">{t('shareQr')}</Button>
         </Link>
       </div>
 
       <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 flex items-center gap-3">
         <span className="text-xl">🏅</span>
         <p className="text-sm text-amber-800">
-          <span className="font-semibold">{program.stampsRequired} sellos</span> para ganar:{' '}
+          <span className="font-semibold">{t('stampsToWin', { count: program.stampsRequired })}</span>{' '}
+          {t('toWin')}{' '}
           <span className="font-medium">{program.rewardDescription}</span>
         </p>
       </div>
