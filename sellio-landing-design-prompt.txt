@@ -1,0 +1,232 @@
+Create a world-class SaaS landing page for "Sellio" — a digital loyalty
+platform for physical businesses in Latin America (Colombia, Mexico, Argentina).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND IDENTITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Product: Sellio
+Tagline: "Fidelizá a tus clientes. Sin tarjetas físicas."
+Market: B2B SaaS for small/medium physical businesses (cafés,
+        restaurants, barbershops, stores)
+
+Color palette — GOLD PREMIUM (not blue, not green, not purple):
+  Background:   #0C0A09 (warm near-black)
+  Surface:      #1C1917 (stone-900)
+  Gold primary: #F59E0B (amber-500)
+  Gold dark:    #D97706 (amber-600)
+  Gold deepest: #B45309 (amber-700)
+  Gold glow:    #FCD34D (amber-300)
+  Text light:   #F5F5F4 (stone-100)
+  Text muted:   #78716C (stone-500)
+  Accent:       #10B981 (emerald — for checkmarks/success only)
+
+Typography: Display font — bold, modern, tight tracking.
+  Hero headline at 80px+. Think Cal Sans, Sohne, or similar.
+
+Visual references for aesthetic:
+  - Stripe.com (clean, premium, confident)
+  - Linear.app (dark, sharp, developer-loved)
+  - Mercury Bank (warm dark, financial trust)
+  - Ramp.com (data-forward, business-grade)
+  - BUT: warmer than all of them — this is LATAM, not Silicon Valley
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT SELLIO DOES (use this for copy)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The problem it solves:
+  • 70% of customers lose physical stamp/loyalty cards
+  • Existing SaaS solutions charge 30%+ commission or per-customer fees
+  • Building their own software is out of reach for small businesses
+  • Most loyalty apps require the customer to download a native app (they don't)
+
+The solution:
+  • The business creates a digital loyalty program in 2 minutes
+  • They get a unique QR code to show at the register
+  • The customer scans it with their phone camera — no app download needed
+  • They enter their phone number, get a digital stamp card
+  • Stamps accumulate. When complete → reward is unlocked
+  • The business sees all customers, stamps, and redemptions in a dashboard
+
+Key differentiators:
+  • Zero friction for the customer (just a browser, no download)
+  • Ready in 2 minutes (not 2 days)
+  • Free to start (no credit card)
+  • Made for LATAM pricing and reality
+  • No commission on rewards — flat subscription only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE STRUCTURE — 8 SECTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. NAVBAR (sticky, glass blur dark)
+   Logo: "S" in gold square + "Sellio" wordmark
+   Nav: Cómo funciona · Funciones · Precios
+   Right: "Iniciar sesión" (ghost) + "Empezar gratis →" (gold pill button)
+
+2. HERO (dark warm gradient, full viewport height)
+
+   Eyebrow badge: "✦ Fidelización digital para negocios · Gratis para empezar"
+
+   H1 (two lines, massive):
+     Line 1 normal: "Fidelizá a tus clientes."
+     Line 2 gold shimmer/gradient: "Sin tarjetas físicas."
+
+   Subheadline:
+   "Creá tu programa de sellos digital en 2 minutos. Tus clientes
+   acumulan puntos desde su celular — sin apps, sin fricción."
+
+   Two CTAs:
+     Primary: "Empezar gratis — sin tarjeta de crédito →"  (gold, glowing)
+     Secondary: "Ver cómo funciona"  (dark outlined)
+
+   Social proof bar (horizontal):
+     "1.000+ negocios · 40.000+ clientes activos · 98% retención"
+
+   HERO VISUAL — A floating smartphone mockup showing:
+     The screen displays a digital gold loyalty card with:
+     - Business name at top
+     - 7 of 10 gold stamps filled (circular stamps in a grid)
+     - Progress bar in amber
+     - "Café gratis al completar" reward text
+     The phone has a warm golden glow/halo behind it
+     Light particles or subtle confetti around it
+
+3. SOCIAL PROOF LOGOS BAR
+   "Usado por negocios en toda LATAM"
+   Show 5-6 placeholder business category logos/icons:
+   Cafeterías · Restaurantes · Barberías · Tiendas · Salones · Pastelerías
+
+4. HOW IT WORKS (light stone-50 section)
+   Title: "Listo en 3 pasos"
+
+   Step 1 — "Configurá tu negocio"
+   Large number "01" in gold, icon of a storefront
+   "Registrate gratis, elegí cuántos sellos necesita tu cliente y qué
+   recompensa recibe. 2 minutos, en serio."
+
+   Step 2 — "Mostrá tu QR"
+   Large number "02" in gold, icon of a QR code / phone scan
+   "Descargá tu código QR único y mostralo en tu mostrador. Cada cliente
+   lo escanea con la cámara de su celular — sin descargar nada."
+
+   Step 3 — "Tus clientes vuelven"
+   Large number "03" in gold, icon of a returning customer / heart
+   "Cada visita suma un sello. Cuando completan la tarjeta, Sellio les
+   avisa que tienen su premio. Vos solo tenés que entregarlo."
+
+   Visual: A horizontal flow diagram or stacked cards showing
+   the QR → phone → stamp → reward journey
+
+5. FEATURES (dark stone-950 section)
+
+   Title: "Todo lo que necesitás" (with gold shimmer)
+   Subtitle: "Sin complicaciones. Sin comisiones. Sin sorpresas."
+
+   Layout: 2 large features (left column, full height) + 4 smaller (right, 2x2 grid)
+
+   Large feature 1 — "Sin app para el cliente"
+   Show: Browser address bar with a loyalty card inside
+   Copy: "Tus clientes no descargan nada. Solo escanean el QR
+   y listo — funciona en cualquier celular, en cualquier navegador."
+
+   Large feature 2 — "Dashboard en tiempo real"
+   Show: Mini dashboard mockup with metrics
+   Copy: "Ves cuántos clientes tenés, cuántos sellos se dieron,
+   cuántos canjes ocurrieron. Todo en tiempo real desde tu celular."
+
+   Small features (4 cards):
+   QR instantáneo — "Tu código QR listo en 2 minutos"
+   Recompensas flexibles — "Vos elegís qué ofrecés: producto gratis, descuento, 2x1"
+   Sin vendor lock-in — "Tus datos son tuyos, exportalos cuando quieras"
+   Hecho para LATAM — "Precios en pesos, soporte en español"
+
+6. TESTIMONIALS / SOCIAL PROOF (warm dark)
+   3 testimonial cards in a row:
+
+   Card 1:
+   "Empecé a usar Sellio hace 3 meses y la retención de clientes
+   subió un 40%. Lo mejor es que mis clientes no tienen que instalar nada."
+   — María García · Café Aroma, Bogotá ★★★★★
+
+   Card 2:
+   "En 2 minutos tenía mi QR listo. Mis clientes preguntan por el
+   programa de puntos antes de que yo les cuente. Es increíble."
+   — Carlos Rodríguez · Barbería El Estilo, Medellín ★★★★★
+
+   Card 3:
+   "Antes perdíamos tarjetas físicas todo el tiempo. Ahora todo
+   es digital y puedo ver exactamente cuántos clientes fieles tengo."
+   — Ana López · Pastelería Dulce, CDMX ★★★★★
+
+7. PRICING (stone-50 light section)
+   Title: "Precios que tienen sentido"
+   Subtitle: "Sin comisiones. Sin sorpresas. Sin ataduras."
+
+   Two cards side by side:
+
+   GRATIS — Para siempre
+   (Gold top bar, "MÁS POPULAR" badge)
+   Precio: $0 / mes
+   Incluye:
+   ✓ 1 programa de fidelización
+   ✓ Clientes ilimitados
+   ✓ QR único para tu negocio
+   ✓ Dashboard con métricas básicas
+   ✓ Sin comisiones sobre canjes
+   ✓ Soporte por email
+   CTA: "Empezar gratis →" (gold button)
+
+   PRO — Para negocios en crecimiento
+   (Coming soon, muted)
+   Precio: Próximamente
+   Incluye todo lo del plan gratis, más:
+   ◦ Múltiples programas de fidelización
+   ◦ Notificaciones push a clientes
+   ◦ Apple Wallet / Google Wallet
+   ◦ Analytics avanzados con exportación
+   ◦ API para integrar con tu POS
+   ◦ Soporte prioritario
+   CTA: "Avisarme cuando esté →" (ghost, disabled-ish)
+
+8. FINAL CTA (warm dark gradient: amber-900 → stone-950)
+
+   Visual: Large gold glowing sphere or rings in background
+
+   Big headline: "Empezá a fidelizar hoy"
+   Subtext: "Sin tarjeta de crédito. Sin instalaciones.
+   Configurado en menos de 2 minutos."
+
+   CTA button: "Crear mi cuenta gratis →"
+   (extra large, gold, with pulse glow animation)
+
+   Below button: "Colombia · México · Argentina · Chile"
+
+FOOTER (stone-950)
+   Logo + tagline
+   4 column links: Producto / Legal / Empresa / Soporte
+   "© 2026 Sellio · Fidelización digital para LATAM · Hecho en Colombia"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VISUAL DESIGN RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Backgrounds: alternating dark (stone-950) and light (stone-50) sections
+- Gold is used SPARINGLY as accent — not everywhere, or loses impact
+- Buttons with gold: text must be DARK (#0C0A09), not white
+- Hero phone mockup: dramatic perspective tilt (10-15°), floating
+- Section transitions: smooth gradient blends, not hard cuts
+- Cards: subtle border with gold tint (border: 1px solid rgba(245,158,11,0.15))
+- Shadows: warm-tinted (rgba(245,158,11,0.1) not cold gray)
+- Icons: line-style SVGs in amber-400/500, 24-28px
+- Spacing: generous — this is premium, not cramped
+- Animations: fade-up on scroll, phone float, gold shimmer on headline
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TECH STACK (for implementation reference)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Next.js 16 · TypeScript · Tailwind CSS 4
+Single file: src/app/page.tsx (all sections inline)
+No external component libraries
+All copy in Latin American Spanish (voseo: tenés, podés, usás)
