@@ -29,11 +29,14 @@ export async function requestOtp(slug: string, phoneRaw: string): Promise<Reques
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Número de teléfono inválido' }
   }
-  const phone = normalizePhoneToE164(parsed.data)
-  if (!phone) return { error: 'Número de teléfono inválido' }
 
   const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
   if (!tenant) return { error: 'Negocio no encontrado' }
+
+  // Normaliza con el país del negocio (E.164). El default 'CO' preserva el
+  // comportamiento histórico para los tenants ya existentes.
+  const phone = normalizePhoneToE164(parsed.data, tenant.countryCode)
+  if (!phone) return { error: 'Número de teléfono inválido' }
 
   const [program] = await db
     .select()

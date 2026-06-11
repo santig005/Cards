@@ -3,22 +3,37 @@
  * sin levantar Supabase. Las server actions la consumen.
  */
 
-// País por defecto cuando el cliente no incluye código (Colombia).
-export const DEFAULT_COUNTRY_CODE = '+57'
+import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js'
+import { DEFAULT_COUNTRY } from '@/lib/countries'
+
+// País por defecto (ISO 3166-1 alpha-2) cuando el negocio no tiene uno seteado.
+// Coincide con el default de la columna tenants.country_code (ver ADR-007).
+export const DEFAULT_COUNTRY_CODE = DEFAULT_COUNTRY // 'CO'
 
 /**
- * Normaliza un teléfono a formato E.164 (lo que exige Supabase Auth).
- * Devuelve null si no hay dígitos suficientes para ser un número válido.
+ * Normaliza un teléfono a formato E.164 (lo que exige Supabase Auth) usando el
+ * país del negocio (`tenants.country_code`, ISO 3166-1 alpha-2).
+ *
+ * - Si el usuario escribe el `+` con su indicativo, se respeta ese país.
+ * - Si escribe el número local sin `+`, se interpreta con el país del negocio.
+ *
+ * Usa libphonenumber-js para parsear y validar (largos por país, prefijos
+ * móviles, etc.), reemplazando el viejo "anteponer +57" que fallaba para
+ * cualquier país distinto de Colombia.
+ *
+ * Devuelve el número en E.164 (ej. '+573001234567') o null si no es válido.
  */
 export function normalizePhoneToE164(
   raw: string,
-  defaultCode: string = DEFAULT_COUNTRY_CODE
+  countryCode: string = DEFAULT_COUNTRY_CODE
 ): string | null {
   const trimmed = raw.trim()
-  const hasPlus = trimmed.startsWith('+')
-  const digits = trimmed.replace(/\D/g, '')
-  if (digits.length < 7) return null
-  return hasPlus ? `+${digits}` : `${defaultCode}${digits}`
+  if (!trimmed) return null
+
+  const parsed = parsePhoneNumberFromString(trimmed, countryCode.toUpperCase() as CountryCode)
+  if (!parsed || !parsed.isValid()) return null
+
+  return parsed.number // E.164
 }
 
 export interface StampOutcome {

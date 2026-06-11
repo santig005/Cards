@@ -71,10 +71,11 @@ de Supabase (o con `psql "$DATABASE_URL_DIRECT" -f <archivo>`), en orden:
 | `0001_rls_policies.sql` | Habilita RLS + políticas por tenant (dueño) |
 | `0002_customer_rls.sql` | Acceso del cliente final a su propia tarjeta |
 | `0003_storage_logos.sql` | Bucket público `logos` |
+| `0004_tenant_multipais.sql` | Columnas multi-país en `tenants` (`country_code`, `timezone`, `locale`) — aditiva, ver [ADR-007](docs/adr/ADR-007-multipais.md) |
 
 ## Configuración inicial de Supabase (checklist)
 
-1. **Aplicar las 3 migraciones SQL** de arriba en el SQL Editor.
+1. **Aplicar las 4 migraciones SQL** de arriba en el SQL Editor.
 2. **Auth → Providers → Email:** habilitado (registro/login de negocios).
 3. **Auth → Providers → Phone:** habilitar para el OTP del cliente final.
    - Dev sin costo: agregar un **número de prueba** con código fijo en

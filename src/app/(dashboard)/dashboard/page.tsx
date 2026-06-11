@@ -45,7 +45,7 @@ export default async function DashboardPage() {
       const total = customerResult?.value ?? 0
       const redemptionRate = total > 0 ? Math.round((redeemedCustomers / total) * 100) : 0
 
-      const TZ = 'America/Bogota'
+      const TZ = tenant.timezone
       const now = new Date()
       const since = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000)
       const since7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
         stampCount: stampResult?.value ?? 0,
         redeemCount: cards.reduce((sum, c) => sum + (c.totalRedeemed ?? 0), 0),
         analytics: {
-          byDay: buildLast7Days(now, dayMap, TZ),
+          byDay: buildLast7Days(now, dayMap, TZ, tenant.locale),
           newCustomers7d: newCustomersResult?.value ?? 0,
           returningCount: perCustomer.filter((r) => Number(r.value) > 1).length,
           redemptionRate,

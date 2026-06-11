@@ -54,8 +54,8 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const stampsRequired = program?.stampsRequired ?? 0
   const totalRedeemed = card?.totalRedeemed ?? 0
 
-  const dateFmt = new Intl.DateTimeFormat('es-CO', {
-    timeZone: 'America/Bogota',
+  const dateFmt = new Intl.DateTimeFormat(tenant.locale, {
+    timeZone: tenant.timezone,
     dateStyle: 'medium',
     timeStyle: 'short',
   })
