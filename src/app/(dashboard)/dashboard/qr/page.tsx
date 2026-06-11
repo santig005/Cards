@@ -1,38 +1,16 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
-import { withAuth } from '@/lib/drizzle/db'
-import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
-import { eq } from 'drizzle-orm'
+import { requireTenant } from '@/lib/tenant'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { QRDisplay } from './qr-display'
 
 export default async function QRPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
+  const { tenant, program } = await requireTenant()
   const t = await getTranslations('qr')
 
-  const result = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return null
-    const [program] = await tx
-      .select()
-      .from(loyaltyPrograms)
-      .where(eq(loyaltyPrograms.tenantId, tenant.id))
-      .limit(1)
-    return { tenant, program: program ?? null }
-  })
-
-  if (!result) redirect('/login')
-  const { tenant, program } = result
-
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const clientUrl = `${appUrl}/c/${tenant!.slug}`
+  const clientUrl = `${appUrl}/c/${tenant.slug}`
 
   if (!program) {
     return (
@@ -44,9 +22,7 @@ export default async function QRPage() {
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
           <h2 className="font-semibold text-fg">{t('configFirst')}</h2>
-          <p className="text-sm text-muted">
-            {t('configFirstBody')}
-          </p>
+          <p className="text-sm text-muted">{t('configFirstBody')}</p>
           <Link href="/dashboard/onboarding">
             <Button size="md">{t('configCta')}</Button>
           </Link>
@@ -67,10 +43,10 @@ export default async function QRPage() {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-full px-4 py-1.5">
               <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 shrink-0" />
-              <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{tenant!.name}</span>
+              <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{tenant.name}</span>
             </div>
           </div>
-          <QRDisplay url={clientUrl} tenantName={tenant!.name} />
+          <QRDisplay url={clientUrl} tenantName={tenant.name} />
         </Card>
 
         <div className="mt-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl px-4 py-3 flex items-center gap-3">

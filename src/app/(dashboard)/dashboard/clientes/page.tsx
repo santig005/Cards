@@ -1,35 +1,16 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
 import { withAuth } from '@/lib/drizzle/db'
-import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
+import { customers, loyaltyCards } from '@/lib/drizzle/schema'
 import { eq } from 'drizzle-orm'
+import { requireTenant } from '@/lib/tenant'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CustomerList } from './customer-list'
 
 export default async function ClientesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
+  const { user, tenant, program } = await requireTenant()
   const t = await getTranslations('customers')
-
-  const base = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return null
-    const [program] = await tx
-      .select()
-      .from(loyaltyPrograms)
-      .where(eq(loyaltyPrograms.tenantId, tenant.id))
-      .limit(1)
-    return { tenant, program: program ?? null }
-  })
-
-  if (!base) redirect('/login')
-  const { tenant, program } = base
 
   if (!program) {
     return (
@@ -41,9 +22,7 @@ export default async function ClientesPage() {
         <Card padding="lg" className="text-center space-y-4">
           <div className="text-5xl">🔒</div>
           <h2 className="font-semibold text-fg">{t('configFirst')}</h2>
-          <p className="text-sm text-muted">
-            {t('configFirstBody')}
-          </p>
+          <p className="text-sm text-muted">{t('configFirstBody')}</p>
           <Link href="/dashboard/onboarding">
             <Button size="md">{t('configCta')}</Button>
           </Link>

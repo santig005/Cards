@@ -107,6 +107,8 @@
     "noCustomersTitle": "No customers yet",
     "noCustomersBody": "Share your QR so your customers can start collecting stamps. The first customer is just one scan away!",
     "viewQr": "View my QR 📱",
+    "filterReady": "Ready to redeem",
+    "noReadyCustomers": "No customer has a completed card yet.",
     "noResults": "No customers match \"{query}\".",
     "paginationRange": "{from}–{to} of {total}",
     "previous": "← Previous",

@@ -13,6 +13,11 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: 'Sellio — Fidelización digital',
   description: 'Reemplazá las tarjetas físicas de sellos con una experiencia 100% digital.',
+  appleWebApp: {
+    capable: true,
+    title: 'Sellio',
+    statusBarStyle: 'black-translucent',
+  },
 }
 
 // Next 15+: themeColor va en el export `viewport`, no en `metadata`.

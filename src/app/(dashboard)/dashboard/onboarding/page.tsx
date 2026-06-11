@@ -1,44 +1,18 @@
-import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
-import { withAuth } from '@/lib/drizzle/db'
-import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
-import { eq } from 'drizzle-orm'
+import { requireTenant } from '@/lib/tenant'
 import { Card } from '@/components/ui/card'
 import { OnboardingForm } from './onboarding-form'
 
 export default async function OnboardingPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
+  const { tenant, program: existingProgram } = await requireTenant()
   const t = await getTranslations('onboarding')
 
-  const result = await withAuth(user.id, async (tx) => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return null
-    const [existingProgram] = await tx
-      .select()
-      .from(loyaltyPrograms)
-      .where(eq(loyaltyPrograms.tenantId, tenant.id))
-      .limit(1)
-    return { tenant, existingProgram: existingProgram ?? null }
-  })
-
-  if (!result) redirect('/login')
-  const { tenant, existingProgram } = result
-
   const isEditing = !!existingProgram
-
   const steps = [t('stepAccount'), t('stepProgram'), t('stepReady')]
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
-        {/* Header */}
         <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-2xl p-6 text-white mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
@@ -92,9 +66,7 @@ export default async function OnboardingPage() {
           />
         </Card>
 
-        <p className="text-center text-xs text-muted mt-6">
-          {t('changeLater')}
-        </p>
+        <p className="text-center text-xs text-muted mt-6">{t('changeLater')}</p>
       </div>
     </div>
   )

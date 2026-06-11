@@ -107,6 +107,8 @@
     "noCustomersTitle": "Nenhum cliente ainda",
     "noCustomersBody": "Compartilhe seu QR para que seus clientes comecem a acumular selos. O primeiro cliente está a um escaneamento de distância!",
     "viewQr": "Ver meu QR 📱",
+    "filterReady": "Prontos para resgatar",
+    "noReadyCustomers": "Nenhum cliente tem o cartão completo ainda.",
     "noResults": "Nenhum cliente corresponde a \"{query}\".",
     "paginationRange": "{from}–{to} de {total}",
     "previous": "← Anterior",

@@ -20,6 +20,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
   const t = useTranslations('customers')
   const [query, setQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('recent')
+  const [filterReady, setFilterReady] = useState(false)
   const [page, setPage] = useState(0)
 
   const SORT_OPTIONS: { value: SortBy; label: string }[] = [
@@ -28,14 +29,15 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
     { value: 'stamps', label: t('sortStamps') },
   ]
 
+  const readyCount = useMemo(
+    () => customers.filter((c) => (c.currentStamps ?? 0) >= stampsRequired).length,
+    [customers, stampsRequired]
+  )
+
   function downloadCustomersCsv(rows: CustomerRow[]) {
     const headers = [
-      t('csvName'),
-      t('csvPhone'),
-      t('csvEmail'),
-      t('csvCurrentStamps'),
-      t('csvTotalRedeemed'),
-      t('csvRegistered'),
+      t('csvName'), t('csvPhone'), t('csvEmail'),
+      t('csvCurrentStamps'), t('csvTotalRedeemed'), t('csvRegistered'),
     ]
     const data = rows.map((c) => [
       c.name ?? '',
@@ -45,7 +47,6 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
       c.totalRedeemed ?? 0,
       new Date(c.createdAt).toISOString().slice(0, 10),
     ])
-    // BOM (﻿) para que Excel respete los acentos.
     const csv = '﻿' + toCsv(headers, data)
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -58,34 +59,33 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const base = !q
+    let base = !q
       ? customers
       : customers.filter((c) => [c.name, c.phone, c.email].some((f) => f?.toLowerCase().includes(q)))
+
+    if (filterReady) {
+      base = base.filter((c) => (c.currentStamps ?? 0) >= stampsRequired)
+    }
 
     return [...base].sort((a, b) => {
       if (sortBy === 'name') return (a.name ?? a.phone).localeCompare(b.name ?? b.phone)
       if (sortBy === 'stamps') return (b.currentStamps ?? 0) - (a.currentStamps ?? 0)
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() // recientes
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
-  }, [customers, query, sortBy])
+  }, [customers, query, sortBy, filterReady, stampsRequired])
 
-  // Clamp de la página en render (evita un useEffect): si el filtro achicó la
-  // lista, la página fuera de rango se ajusta sola.
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(page, pageCount - 1)
   const start = safePage * PAGE_SIZE
   const paged = filtered.slice(start, start + PAGE_SIZE)
 
-  // Sin clientes registrados todavía.
   if (customers.length === 0) {
     return (
       <Card padding="lg" className="text-center space-y-4 py-16">
         <div className="text-6xl">👥</div>
         <div>
           <h2 className="text-lg font-semibold text-fg mb-2">{t('noCustomersTitle')}</h2>
-          <p className="text-sm text-muted max-w-sm mx-auto">
-            {t('noCustomersBody')}
-          </p>
+          <p className="text-sm text-muted max-w-sm mx-auto">{t('noCustomersBody')}</p>
         </div>
         <Link href="/dashboard/qr">
           <Button size="md" className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 shadow-[0_4px_16px_-2px_rgb(245_158_11_/_0.4)]">
@@ -98,7 +98,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
 
   return (
     <div className="space-y-4">
-      {/* Controles: buscar + ordenar + exportar */}
+      {/* Controles: buscar + ordenar + filtro listos + exportar */}
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -109,30 +109,44 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
           <input
             type="search"
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(0)
-            }}
+            onChange={(e) => { setQuery(e.target.value); setPage(0) }}
             placeholder={t('searchPlaceholder')}
             aria-label={t('searchLabel')}
             className="h-10 pl-9 pr-4 w-full rounded-xl border border-border bg-surface text-sm text-fg placeholder:text-muted shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
           />
         </div>
+
+        <button
+          type="button"
+          onClick={() => { setFilterReady((v) => !v); setPage(0) }}
+          aria-pressed={filterReady}
+          className={`h-10 px-3 rounded-xl border text-sm font-medium flex items-center gap-1.5 transition-all shrink-0 ${
+            filterReady
+              ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
+              : 'border-border bg-surface text-fg hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-400'
+          }`}
+        >
+          🎁 {t('filterReady')}
+          <span
+            className={`inline-flex items-center justify-center rounded-full text-xs font-bold w-5 h-5 ${
+              filterReady ? 'bg-white/25 text-white' : 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+            }`}
+          >
+            {readyCount}
+          </span>
+        </button>
+
         <select
           value={sortBy}
-          onChange={(e) => {
-            setSortBy(e.target.value as SortBy)
-            setPage(0)
-          }}
+          onChange={(e) => { setSortBy(e.target.value as SortBy); setPage(0) }}
           aria-label={t('sortLabel')}
           className="h-10 px-3 rounded-xl border border-border bg-surface text-sm text-fg shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
         >
           {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
+            <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
+
         <Button type="button" variant="outline" size="md" onClick={() => downloadCustomersCsv(customers)} className="shrink-0">
           {t('exportCsv')}
         </Button>
@@ -141,7 +155,7 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
       {filtered.length === 0 ? (
         <Card padding="lg" className="text-center py-12">
           <p className="text-sm text-gray-500">
-            {t('noResults', { query })}
+            {filterReady ? t('noReadyCustomers') : t('noResults', { query })}
           </p>
         </Card>
       ) : (
@@ -158,22 +172,10 @@ export function CustomerList({ customers, stampsRequired }: CustomerListProps) {
                 {t('paginationRange', { from: start + 1, to: Math.min(start + PAGE_SIZE, filtered.length), total: filtered.length })}
               </span>
               <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPage(Math.max(0, safePage - 1))}
-                  disabled={safePage === 0}
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={() => setPage(Math.max(0, safePage - 1))} disabled={safePage === 0}>
                   {t('previous')}
                 </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}
-                  disabled={safePage >= pageCount - 1}
-                >
+                <Button type="button" variant="ghost" size="sm" onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))} disabled={safePage >= pageCount - 1}>
                   {t('next')}
                 </Button>
               </div>
