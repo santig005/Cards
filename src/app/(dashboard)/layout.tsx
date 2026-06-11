@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   )
 
   return (
-    <div className="min-h-screen bg-[#fafafe] flex">
+    <div className="min-h-screen bg-bg flex">
       {/* Sidebar */}
       <div className="print:hidden">
         <SidebarNav tenantName={tenant?.name ?? 'Sellio'} userEmail={user.email ?? ''} />
@@ -28,7 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile top bar */}
-        <header className="lg:hidden print:hidden bg-white border-b border-amber-100 px-4 h-14 flex items-center justify-between sticky top-0 z-10">
+        <header className="lg:hidden print:hidden bg-surface border-b border-border px-4 h-14 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-[0_4px_12px_-2px_rgb(245_158_11_/_0.4)]">
               <span className="text-stone-950 text-xs font-bold">S</span>

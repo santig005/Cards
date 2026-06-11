@@ -9,7 +9,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const paddings = { none: '', sm: 'p-4', md: 'p-5', lg: 'p-6', xl: 'p-8' }
 
 const variants = {
-  light: 'bg-white border border-stone-100 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.06),0_1px_2px_-1px_rgb(0_0_0_/_0.04)]',
+  light: 'bg-surface border border-border shadow-e1',
   dark:  'bg-stone-900 border border-amber-500/10',
   gold:  'bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20',
 }

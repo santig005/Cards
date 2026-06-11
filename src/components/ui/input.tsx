@@ -21,7 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none">
               {icon}
             </div>
           )}
@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               }
               ${error
                 ? 'border-red-400 focus:ring-red-300/40'
-                : dark ? '' : 'border-stone-200 hover:border-stone-300'
+                : dark ? '' : 'border-stone-300 hover:border-stone-400'
               }
               ${className}
             `}

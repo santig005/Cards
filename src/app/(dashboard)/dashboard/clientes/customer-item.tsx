@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -94,9 +95,9 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
             href={`/dashboard/clientes/${customer.customerId}`}
             aria-label="Ver detalle del cliente"
             title="Ver detalle"
-            className="w-8 h-8 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
           >
-            👁️
+            <Eye className="w-4 h-4" />
           </Link>
           <button
             type="button"
@@ -106,9 +107,9 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
             }}
             aria-label="Editar cliente"
             title="Editar"
-            className="w-8 h-8 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex items-center justify-center"
           >
-            ✏️
+            <Pencil className="w-4 h-4" />
           </button>
           {customer.cardId ? (
             <StampButton
@@ -152,9 +153,9 @@ export function CustomerItem({ customer, stampsRequired, index }: CustomerItemPr
               size="sm"
               onClick={handleDelete}
               loading={isPending}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+              className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50"
             >
-              🗑️ Eliminar
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
             </Button>
             <div className="flex gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)} disabled={isPending}>
