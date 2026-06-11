@@ -7,6 +7,7 @@ import { loyaltyCards, tenants, loyaltyPrograms, customers } from '@/lib/drizzle
 import { eq } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
 import { logoutCustomer } from '../../actions'
+import { ConfettiTrigger } from '@/components/features/confetti-trigger'
 
 interface PageProps {
   params: Promise<{ slug: string; cardId: string }>
@@ -136,6 +137,7 @@ export default async function CardPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-stone-950 via-[#1a0e00] to-stone-950 flex flex-col items-center py-8 px-4 gap-5">
+      <ConfettiTrigger fire={isRedeemable} />
       {/* Page header */}
       <div className="w-full max-w-sm flex items-center justify-between">
         <Link
