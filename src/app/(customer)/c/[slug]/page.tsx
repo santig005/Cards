@@ -190,7 +190,7 @@ export default async function CustomerLandingPage({ params }: PageProps) {
             <p className="text-gray-500 text-sm">{t('cardSubtitle')}</p>
           </div>
 
-          <PhoneForm slug={slug} />
+          <PhoneForm slug={slug} countryCode={tenant.countryCode} />
         </div>
       </div>
 

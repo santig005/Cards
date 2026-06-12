@@ -40,6 +40,9 @@ export async function createProgram(formData: FormData) {
     stampsRequired: formData.get('stampsRequired') as string,
     rewardType: formData.get('rewardType') as string,
     rewardDescription: formData.get('rewardDescription') as string,
+    countryCode: formData.get('countryCode') as string | undefined,
+    timezone: formData.get('timezone') as string | undefined,
+    locale: formData.get('locale') as string | undefined,
   }
 
   const v = await getTranslations('validation')
@@ -51,6 +54,8 @@ export async function createProgram(formData: FormData) {
     descMax200: v('descMax200'),
     nameMin2: v('nameMin2'),
     nameMax80: v('nameMax80'),
+    countryRequired: v('countryRequired'),
+    timezoneRequired: v('timezoneRequired'),
   })
   const result = schema.safeParse(raw)
   if (!result.success) {
@@ -85,6 +90,9 @@ export async function createProgram(formData: FormData) {
       .set({
         name: result.data.businessName,
         ...(logoUrl ? { logoUrl } : {}),
+        ...(result.data.countryCode ? { countryCode: result.data.countryCode } : {}),
+        ...(result.data.timezone ? { timezone: result.data.timezone } : {}),
+        ...(result.data.locale ? { locale: result.data.locale } : {}),
         updatedAt: new Date(),
       })
       .where(eq(tenants.id, tenant.id))
