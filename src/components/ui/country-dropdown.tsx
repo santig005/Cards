@@ -99,7 +99,7 @@ export function CountryDropdown({
   }
 
   return (
-    <div className="flex flex-col gap-1.5" ref={containerRef}>
+    <div className={`flex flex-col gap-1.5 ${open ? 'relative z-50' : ''}`} ref={containerRef}>
       {label && (
         <label htmlFor={id} className="text-sm font-medium text-fg select-none">
           {label}
@@ -143,7 +143,7 @@ export function CountryDropdown({
 
         {open && (
           <div
-            className={`absolute z-30 mt-1 overflow-hidden rounded-xl border border-border bg-surface shadow-lg ${
+            className={`absolute z-50 mt-1 overflow-hidden rounded-xl border border-border bg-surface shadow-lg ${
               variant === 'compact' ? 'w-72 max-w-[80vw]' : 'w-full'
             }`}
             role="listbox"
