@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { getCountry, DEFAULT_COUNTRY } from '@/lib/countries'
+import { CountryDropdown } from '@/components/ui/country-dropdown'
+import { DEFAULT_COUNTRY } from '@/lib/countries'
 import { getLegalNoticeKey } from '@/lib/legal'
 import { requestOtp, verifyOtp } from './actions'
 
@@ -20,14 +21,17 @@ type Step = 'phone' | 'code'
 export function PhoneForm({ slug, countryCode = DEFAULT_COUNTRY }: PhoneFormProps) {
   const router = useRouter()
   const t = useTranslations('customer.form')
+  const locale = useLocale() as 'es' | 'en' | 'pt'
   const [step, setStep] = useState<Step>('phone')
   const [phone, setPhone] = useState('')
+  // País del cliente: arranca en el del negocio (escaneó su QR), pero puede cambiarlo.
+  const [selectedCountry, setSelectedCountry] = useState(countryCode)
   const [sentTo, setSentTo] = useState('') // teléfono normalizado (E.164) del paso 1
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(false)
 
-  const country = getCountry(countryCode) ?? getCountry(DEFAULT_COUNTRY)!
+  // El aviso legal sigue atado al país del negocio (jurisdicción de tratamiento de datos).
   const legalKey = getLegalNoticeKey(countryCode)
 
   async function handleRequestOtp(e: React.FormEvent<HTMLFormElement>): Promise<void> {
@@ -35,7 +39,7 @@ export function PhoneForm({ slug, countryCode = DEFAULT_COUNTRY }: PhoneFormProp
     setError(undefined)
     setLoading(true)
     try {
-      const result = await requestOtp(slug, phone)
+      const result = await requestOtp(slug, phone, selectedCountry)
       if ('error' in result) {
         setError(result.error)
         return
@@ -121,12 +125,13 @@ export function PhoneForm({ slug, countryCode = DEFAULT_COUNTRY }: PhoneFormProp
           {t('phoneLabel')}
         </label>
         <div className="flex items-center gap-2">
-          <span
-            className="flex h-12 items-center rounded-xl border border-border bg-surface px-3 text-sm font-semibold text-fg shrink-0 select-none"
-            title={country.nameEn}
-          >
-            {country.flag} +{country.dialCode}
-          </span>
+          <CountryDropdown
+            variant="compact"
+            locale={locale}
+            value={selectedCountry}
+            onChange={setSelectedCountry}
+            disabled={loading}
+          />
           <input
             type="tel"
             placeholder="300 123 4567"
@@ -135,7 +140,7 @@ export function PhoneForm({ slug, countryCode = DEFAULT_COUNTRY }: PhoneFormProp
             disabled={loading}
             autoComplete="tel"
             inputMode="tel"
-            className="h-12 w-full rounded-xl border border-border bg-surface px-3.5 text-base text-fg placeholder:text-muted transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 hover:border-border-strong disabled:opacity-50 disabled:cursor-not-allowed"
+            className="h-12 w-full min-w-0 rounded-xl border border-border bg-surface px-3.5 text-base text-fg placeholder:text-muted transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 hover:border-border-strong disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
         {error && (

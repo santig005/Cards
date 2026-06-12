@@ -4,9 +4,9 @@ import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { CountrySelect } from '@/components/ui/country-select'
+import { CountryDropdown } from '@/components/ui/country-dropdown'
 import { TimezoneSelect } from '@/components/ui/timezone-select'
-import { countriesSorted, getCountry } from '@/lib/countries'
+import { getCountry } from '@/lib/countries'
 import { createProgram } from './actions'
 
 interface ExistingProgram {
@@ -159,9 +159,9 @@ export function OnboardingForm({
 
       {/* Country */}
       <div>
-        <CountrySelect
+        <CountryDropdown
+          variant="full"
           locale={uiLocale}
-          countries={countriesSorted}
           value={countryCode}
           onChange={handleCountryChange}
           label={t('countryLabel')}

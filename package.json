@@ -19,6 +19,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.107.0",
+    "country-flag-icons": "^1.6.17",
     "drizzle-orm": "^0.45.2",
     "libphonenumber-js": "^1.13.6",
     "lucide-react": "^1.17.0",
