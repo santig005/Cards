@@ -34,12 +34,15 @@ export async function requestOtp(slug: string, phoneRaw: string): Promise<Reques
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? v('invalidData') }
   }
-  const phone = normalizePhoneToE164(parsed.data)
-  const t = await getTranslations('errors')
-  if (!phone) return { error: t('invalidPhone') }
 
+  const t = await getTranslations('errors')
   const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
   if (!tenant) return { error: t('businessNotFound') }
+
+  // Normaliza con el país del negocio (E.164). El default 'CO' preserva el
+  // comportamiento histórico para los tenants ya existentes.
+  const phone = normalizePhoneToE164(parsed.data, tenant.countryCode)
+  if (!phone) return { error: t('invalidPhone') }
 
   const [program] = await db
     .select()

@@ -8,12 +8,13 @@ import {
 } from '../../src/lib/loyalty'
 
 describe('normalizePhoneToE164', () => {
-  it('antepone el código de país por defecto (+57) cuando no hay +', () => {
+  it('usa Colombia por defecto (móvil local sin +)', () => {
     expect(normalizePhoneToE164('3001234567')).toBe('+573001234567')
   })
 
-  it('respeta el + y el código que ya trae el usuario', () => {
-    expect(normalizePhoneToE164('+13001234567')).toBe('+13001234567')
+  it('respeta el indicativo cuando el usuario escribe el +', () => {
+    // Número de EE.UU. en E.164 — se preserva aunque el país base sea CO.
+    expect(normalizePhoneToE164('+12015550123')).toBe('+12015550123')
   })
 
   it('limpia espacios, guiones y paréntesis', () => {
@@ -21,17 +22,34 @@ describe('normalizePhoneToE164', () => {
     expect(normalizePhoneToE164('300 123 4567')).toBe('+573001234567')
   })
 
-  it('devuelve null si hay menos de 7 dígitos', () => {
+  // México: móvil local de 10 dígitos. Con el viejo default '+57' esto producía
+  // '+575512345678' (un número colombiano inválido); ahora se parsea como MX.
+  it('normaliza un móvil de México con country_code MX', () => {
+    expect(normalizePhoneToE164('5512345678', 'MX')).toBe('+525512345678')
+    // Sin pasar MX, el mismo input se interpretaría como CO (regresión que evitamos).
+    expect(normalizePhoneToE164('5512345678', 'MX')).not.toBe('+575512345678')
+  })
+
+  // EE.UU.: número local de 10 dígitos (área 201). Antes el default lo volvía
+  // '+572015550123'; ahora es un E.164 válido de US.
+  it('normaliza un número local de EE.UU. con country_code US', () => {
+    expect(normalizePhoneToE164('2015550123', 'US')).toBe('+12015550123')
+  })
+
+  it('acepta el ISO en minúsculas', () => {
+    expect(normalizePhoneToE164('5512345678', 'mx')).toBe('+525512345678')
+  })
+
+  it('rechaza números inválidos para el país (longitud incorrecta)', () => {
     expect(normalizePhoneToE164('12345')).toBeNull()
     expect(normalizePhoneToE164('+')).toBeNull()
+    expect(normalizePhoneToE164('')).toBeNull()
+    // 9 dígitos no es un móvil colombiano válido.
+    expect(normalizePhoneToE164('300123456')).toBeNull()
   })
 
-  it('permite sobreescribir el código de país por defecto', () => {
-    expect(normalizePhoneToE164('5512345678', '+52')).toBe('+525512345678')
-  })
-
-  it('expone +57 como default de Colombia', () => {
-    expect(DEFAULT_COUNTRY_CODE).toBe('+57')
+  it('expone CO como país por defecto', () => {
+    expect(DEFAULT_COUNTRY_CODE).toBe('CO')
   })
 })
 

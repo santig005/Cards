@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, char, integer, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core'
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -13,6 +13,13 @@ export const tenants = pgTable('tenants', {
   logoUrl: text('logo_url'),
   ownerId: uuid('owner_id').notNull(), // ref → auth.users
   collectCustomerData: boolean('collect_customer_data').notNull().default(false),
+  // ── Multi-país (ver ADR-007) ──────────────────────────────────────────────
+  // ISO 3166-1 alpha-2 del negocio; ancla la normalización de teléfono (E.164).
+  countryCode: char('country_code', { length: 2 }).notNull().default('CO'),
+  // Zona horaria IANA del negocio; usada para agrupar analytics por día local.
+  timezone: text('timezone').notNull().default('America/Bogota'),
+  // Idioma preferido del negocio (es | en | pt).
+  locale: text('locale').notNull().default('es'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

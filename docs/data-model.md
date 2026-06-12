@@ -31,6 +31,9 @@ Representa un negocio suscrito a Sellio.
 | logo_url | text? | URL del logo |
 | owner_id | uuid | FK → auth.users (dueño del negocio) |
 | collect_customer_data | boolean | Si solicita nombre/email al cliente |
+| country_code | char(2) | ISO 3166-1 alpha-2 del negocio (default `CO`); ancla normalización de teléfono a E.164 (ADR-007) |
+| timezone | text | Zona horaria IANA (default `America/Bogota`); agrupa analytics por día local |
+| locale | text | Idioma del negocio: es \| en \| pt (default `es`) |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
