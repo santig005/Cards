@@ -28,7 +28,8 @@
       "verifying": "Verificando...",
       "sentTo": "Enviamos um código pelo WhatsApp para {phone}.",
       "changeNumber": "Usar outro número",
-      "errorGeneric": "Ocorreu um erro inesperado. Tente novamente."
+      "errorGeneric": "Ocorreu um erro inesperado. Tente novamente.",
+      "tooManyRegistrations": "Muitos novos registros. Tente novamente em um minuto."
     }
   },
   "card": {
@@ -251,6 +252,22 @@
     "testimonialBusiness": "Café El Rincón",
     "copyright": "© 2026 Sellio · Fidelidade digital"
   },
+  "validation": {
+    "emailInvalid": "Email inválido",
+    "passwordMin": "Mínimo 8 caracteres",
+    "nameMin2": "Mínimo 2 caracteres",
+    "nameMax80": "Máximo 80 caracteres",
+    "descMin3": "Mínimo 3 caracteres",
+    "descMax200": "Máximo 200 caracteres",
+    "stampsMin": "Mínimo 3 selos",
+    "stampsMax": "Máximo 30 selos",
+    "rewardTypeRequired": "Selecione um tipo de recompensa",
+    "phoneMin7": "O número deve ter pelo menos 7 dígitos",
+    "phoneInvalidChars": "Apenas números, espaços e o símbolo + são permitidos",
+    "emailOrEmpty": "Email inválido",
+    "nameMax80Short": "Máximo 80 caracteres",
+    "invalidData": "Dados inválidos"
+  },
   "errors": {
     "unauthorized": "Não autorizado",
     "businessNotFound": "Negócio não encontrado",
@@ -267,6 +284,8 @@
     "logoType": "O logo deve ser PNG, JPG ou WEBP.",
     "logoSize": "O logo não pode ter mais de 2 MB.",
     "logoUploadFailed": "Não foi possível enviar o logo. Tente novamente.",
-    "checkEmail": "Verifique seu email para confirmar sua conta antes de entrar."
+    "checkEmail": "Verifique seu email para confirmar sua conta antes de entrar.",
+    "invalidPhone": "Número de telefone inválido",
+    "otpSendError": "Não conseguimos enviar o código. Verifique seu número e tente novamente."
   }
 }

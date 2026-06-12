@@ -1,21 +1,35 @@
 import { z } from 'zod'
 
-export const createProgramSchema = z.object({
-  stampsRequired: z.coerce
-    .number()
-    .min(3, 'Mínimo 3 sellos')
-    .max(30, 'Máximo 30 sellos'),
-  rewardType: z.enum(['free_product', 'discount_percent', 'two_for_one', 'custom'], {
-    message: 'Seleccioná un tipo de recompensa',
-  }),
-  rewardDescription: z
-    .string()
-    .min(3, 'Mínimo 3 caracteres')
-    .max(200, 'Máximo 200 caracteres'),
-  businessName: z
-    .string()
-    .min(2, 'Mínimo 2 caracteres')
-    .max(80, 'Máximo 80 caracteres'),
-})
+export type OnboardingMessages = {
+  stampsMin: string
+  stampsMax: string
+  rewardTypeRequired: string
+  descMin3: string
+  descMax200: string
+  nameMin2: string
+  nameMax80: string
+}
 
+export function buildCreateProgramSchema(m: OnboardingMessages) {
+  return z.object({
+    stampsRequired: z.coerce.number().min(3, m.stampsMin).max(30, m.stampsMax),
+    rewardType: z.enum(['free_product', 'discount_percent', 'two_for_one', 'custom'], {
+      message: m.rewardTypeRequired,
+    }),
+    rewardDescription: z.string().min(3, m.descMin3).max(200, m.descMax200),
+    businessName: z.string().min(2, m.nameMin2).max(80, m.nameMax80),
+  })
+}
+
+const ES_DEFAULTS: OnboardingMessages = {
+  stampsMin: 'Mínimo 3 sellos',
+  stampsMax: 'Máximo 30 sellos',
+  rewardTypeRequired: 'Seleccioná un tipo de recompensa',
+  descMin3: 'Mínimo 3 caracteres',
+  descMax200: 'Máximo 200 caracteres',
+  nameMin2: 'Mínimo 2 caracteres',
+  nameMax80: 'Máximo 80 caracteres',
+}
+
+export const createProgramSchema = buildCreateProgramSchema(ES_DEFAULTS)
 export type CreateProgramInput = z.infer<typeof createProgramSchema>

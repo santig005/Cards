@@ -179,10 +179,12 @@ export async function undoLastStamp(cardId: string): Promise<UndoResult> {
 
 // ─── Gestión de clientes ──────────────────────────────────────────────────────
 
-const updateCustomerSchema = z.object({
-  name: z.string().trim().max(80, 'Máximo 80 caracteres').optional(),
-  email: z.union([z.string().trim().email('Email inválido'), z.literal('')]).optional(),
-})
+function buildUpdateCustomerSchema(nameMax80: string, emailOrEmpty: string) {
+  return z.object({
+    name: z.string().trim().max(80, nameMax80).optional(),
+    email: z.union([z.string().trim().email(emailOrEmpty), z.literal('')]).optional(),
+  })
+}
 
 type UpdateCustomerResult = { error: string } | { success: true }
 
@@ -196,9 +198,11 @@ export async function updateCustomer(
   const t = await getTranslations('errors')
   if (!user) return { error: t('unauthorized') }
 
-  const parsed = updateCustomerSchema.safeParse(input)
+  const v = await getTranslations('validation')
+  const schema = buildUpdateCustomerSchema(v('nameMax80'), v('emailOrEmpty'))
+  const parsed = schema.safeParse(input)
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }
+    return { error: parsed.error.issues[0]?.message ?? v('invalidData') }
   }
 
   const result = await withAuth(user.id, async (tx): Promise<UpdateCustomerResult> => {

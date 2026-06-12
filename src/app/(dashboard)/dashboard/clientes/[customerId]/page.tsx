@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { withAuth } from '@/lib/drizzle/db'
 import { customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
@@ -16,6 +16,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const { customerId } = await params
   const { user, tenant } = await requireTenant()
   const t = await getTranslations('customerDetail')
+  const locale = await getLocale()
 
   const data = await withAuth(user.id, async (tx) => {
     const [customer] = await tx
@@ -54,7 +55,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
   const stampsRequired = program?.stampsRequired ?? 0
   const totalRedeemed = card?.totalRedeemed ?? 0
 
-  const dateFmt = new Intl.DateTimeFormat('es-CO', {
+  const dateFmt = new Intl.DateTimeFormat(locale, {
     timeZone: 'America/Bogota',
     dateStyle: 'medium',
     timeStyle: 'short',
