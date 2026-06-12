@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { requireTenant } from '@/lib/tenant'
 import { Card } from '@/components/ui/card'
 import { OnboardingForm } from './onboarding-form'
@@ -6,6 +6,7 @@ import { OnboardingForm } from './onboarding-form'
 export default async function OnboardingPage() {
   const { tenant, program: existingProgram } = await requireTenant()
   const t = await getTranslations('onboarding')
+  const uiLocale = (await getLocale()) as 'es' | 'en' | 'pt'
 
   const isEditing = !!existingProgram
   const steps = [t('stepAccount'), t('stepProgram'), t('stepReady')]
@@ -63,6 +64,10 @@ export default async function OnboardingPage() {
             defaultBusinessName={tenant.name}
             defaultLogoUrl={tenant.logoUrl ?? undefined}
             existingProgram={existingProgram ?? undefined}
+            defaultCountryCode={tenant.countryCode}
+            defaultTimezone={tenant.timezone}
+            defaultLocale={(tenant.locale as 'es' | 'en' | 'pt') ?? 'es'}
+            uiLocale={uiLocale}
           />
         </Card>
 

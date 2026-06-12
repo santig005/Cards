@@ -4,6 +4,9 @@ import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CountryDropdown } from '@/components/ui/country-dropdown'
+import { TimezoneSelect } from '@/components/ui/timezone-select'
+import { getCountry } from '@/lib/countries'
 import { createProgram } from './actions'
 
 interface ExistingProgram {
@@ -16,11 +19,38 @@ interface OnboardingFormProps {
   defaultBusinessName: string
   defaultLogoUrl?: string
   existingProgram?: ExistingProgram
+  defaultCountryCode: string
+  defaultTimezone: string
+  defaultLocale: 'es' | 'en' | 'pt'
+  uiLocale: 'es' | 'en' | 'pt'
 }
 
 type RewardType = 'free_product' | 'discount_percent' | 'two_for_one' | 'custom'
 
-export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingProgram }: OnboardingFormProps) {
+const LOCALE_SUGGESTION: Record<string, 'es' | 'en' | 'pt'> = {
+  BR: 'pt',
+  PT: 'pt',
+  US: 'en',
+  GB: 'en',
+  CA: 'en',
+  AU: 'en',
+  NZ: 'en',
+  IE: 'en',
+}
+
+function suggestLocale(iso2: string): 'es' | 'en' | 'pt' {
+  return LOCALE_SUGGESTION[iso2.toUpperCase()] ?? 'es'
+}
+
+export function OnboardingForm({
+  defaultBusinessName,
+  defaultLogoUrl,
+  existingProgram,
+  defaultCountryCode,
+  defaultTimezone,
+  defaultLocale,
+  uiLocale,
+}: OnboardingFormProps) {
   const t = useTranslations('onboarding')
   const [selectedReward, setSelectedReward] = useState<RewardType>(
     (existingProgram?.rewardType as RewardType) ?? 'free_product'
@@ -29,6 +59,19 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
   const logoInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  const [countryCode, setCountryCode] = useState(defaultCountryCode || 'CO')
+  const [timezone, setTimezone] = useState(defaultTimezone || 'America/Bogota')
+  const [locale, setLocale] = useState<'es' | 'en' | 'pt'>(defaultLocale ?? 'es')
+
+  function handleCountryChange(iso2: string): void {
+    setCountryCode(iso2)
+    const country = getCountry(iso2)
+    if (country) {
+      setTimezone(country.defaultTimezone)
+      setLocale(suggestLocale(iso2))
+    }
+  }
 
   const REWARD_OPTIONS: {
     value: RewardType
@@ -49,13 +92,16 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
     custom: t('rewardCustomPlaceholder'),
   }
 
-  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const file = e.target.files?.[0]
     if (file) setLogoPreview(URL.createObjectURL(file))
   }
 
-  function handleSubmit(formData: FormData) {
+  function handleSubmit(formData: FormData): void {
     setError(null)
+    formData.set('countryCode', countryCode)
+    formData.set('timezone', timezone)
+    formData.set('locale', locale)
     startTransition(async () => {
       const result = await createProgram(formData)
       if (result?.error) {
@@ -109,6 +155,31 @@ export function OnboardingForm({ defaultBusinessName, defaultLogoUrl, existingPr
           placeholder={t('businessNamePlaceholder')}
           required
         />
+      </div>
+
+      {/* Country */}
+      <div>
+        <CountryDropdown
+          variant="full"
+          locale={uiLocale}
+          value={countryCode}
+          onChange={handleCountryChange}
+          label={t('countryLabel')}
+          placeholder={t('countryPlaceholder')}
+        />
+      </div>
+
+      {/* Timezone */}
+      <div>
+        <TimezoneSelect
+          value={timezone}
+          onChange={setTimezone}
+          label={t('timezoneLabel')}
+          placeholder={t('timezonePlaceholder')}
+        />
+        <p className="mt-1 text-xs text-muted">
+          {t('localeNote', { locale })}
+        </p>
       </div>
 
       {/* Stamps required */}

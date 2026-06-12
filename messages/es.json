@@ -18,10 +18,13 @@
     "poweredBy": "Powered by",
     "form": {
       "phoneLabel": "Tu número de celular",
+      "phonePrefix": "+{dialCode}",
       "phoneHint": "Te enviaremos un código por WhatsApp para identificarte",
       "continue": "Continuar con WhatsApp",
       "sending": "Enviando código...",
       "habeas": "Al continuar aceptás el tratamiento de tu número según la Ley 1581 de 2012 (Habeas Data). No compartimos tu información con terceros.",
+      "habeasCO": "Al continuar aceptás el tratamiento de tu número según la Ley 1581 de 2012 (Habeas Data). No compartimos tu información con terceros.",
+      "habeasGeneric": "Al continuar aceptás el tratamiento de tus datos personales conforme a la normativa de protección de datos aplicable. No compartimos tu información con terceros.",
       "codeLabel": "Código de verificación",
       "codeHint": "Revisá tu WhatsApp e ingresá el código de 6 dígitos",
       "verify": "Ver mi tarjeta",
@@ -219,7 +222,12 @@
     "rewardCustomDesc": "Definí tu propia recompensa",
     "rewardCustomPlaceholder": "Describí la recompensa que vas a ofrecer…",
     "saveChanges": "Guardar cambios",
-    "startUsing": "Comenzar a usar Sellio 🚀"
+    "startUsing": "Comenzar a usar Sellio 🚀",
+    "countryLabel": "País del negocio",
+    "countryPlaceholder": "Seleccioná el país",
+    "timezoneLabel": "Zona horaria",
+    "timezonePlaceholder": "Seleccioná la zona horaria",
+    "localeNote": "Idioma sugerido según el país: {locale}"
   },
   "auth": {
     "loginTitle": "Bienvenido de vuelta",
@@ -262,6 +270,8 @@
     "stampsMin": "Mínimo 3 sellos",
     "stampsMax": "Máximo 30 sellos",
     "rewardTypeRequired": "Seleccioná un tipo de recompensa",
+    "countryRequired": "Seleccioná un país válido",
+    "timezoneRequired": "Ingresá una zona horaria",
     "phoneMin7": "El número debe tener al menos 7 dígitos",
     "phoneInvalidChars": "Solo se permiten números, espacios y el símbolo +",
     "emailOrEmpty": "Email inválido",

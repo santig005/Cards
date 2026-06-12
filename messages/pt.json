@@ -18,10 +18,13 @@
     "poweredBy": "Powered by",
     "form": {
       "phoneLabel": "Seu número de celular",
+      "phonePrefix": "+{dialCode}",
       "phoneHint": "Enviaremos um código pelo WhatsApp para identificar você",
       "continue": "Continuar com WhatsApp",
       "sending": "Enviando código...",
       "habeas": "Ao continuar, você aceita o tratamento do seu número conforme a lei de proteção de dados aplicável. Não compartilhamos suas informações com terceiros.",
+      "habeasCO": "Ao continuar, você aceita o tratamento do seu número conforme a Lei 1581 de 2012 (Habeas Data) da Colômbia. Não compartilhamos suas informações com terceiros.",
+      "habeasGeneric": "Ao continuar, você aceita o tratamento dos seus dados pessoais conforme a legislação de proteção de dados aplicável. Não compartilhamos suas informações com terceiros.",
       "codeLabel": "Código de verificação",
       "codeHint": "Verifique seu WhatsApp e digite o código de 6 dígitos",
       "verify": "Ver meu cartão",
@@ -219,7 +222,12 @@
     "rewardCustomDesc": "Defina sua própria recompensa",
     "rewardCustomPlaceholder": "Descreva a recompensa que você vai oferecer…",
     "saveChanges": "Salvar alterações",
-    "startUsing": "Começar a usar o Sellio 🚀"
+    "startUsing": "Começar a usar o Sellio 🚀",
+    "countryLabel": "País do negócio",
+    "countryPlaceholder": "Selecione o país",
+    "timezoneLabel": "Fuso horário",
+    "timezonePlaceholder": "Selecione o fuso horário",
+    "localeNote": "Idioma sugerido com base no país: {locale}"
   },
   "auth": {
     "loginTitle": "Bem-vindo de volta",
@@ -262,6 +270,8 @@
     "stampsMin": "Mínimo 3 selos",
     "stampsMax": "Máximo 30 selos",
     "rewardTypeRequired": "Selecione um tipo de recompensa",
+    "countryRequired": "Selecione um país válido",
+    "timezoneRequired": "Informe um fuso horário",
     "phoneMin7": "O número deve ter pelo menos 7 dígitos",
     "phoneInvalidChars": "Apenas números, espaços e o símbolo + são permitidos",
     "emailOrEmpty": "Email inválido",

@@ -27,7 +27,11 @@ type VerifyOtpResult = { cardId: string } | { error: string }
  * Paso 1: valida negocio + programa y dispara el OTP por WhatsApp.
  * Devuelve el teléfono normalizado para reusarlo en la verificación.
  */
-export async function requestOtp(slug: string, phoneRaw: string): Promise<RequestOtpResult> {
+export async function requestOtp(
+  slug: string,
+  phoneRaw: string,
+  countryCode?: string
+): Promise<RequestOtpResult> {
   const v = await getTranslations('validation')
   const rawPhoneSchema = buildRawPhoneSchema(v('phoneMin7'), v('phoneInvalidChars'))
   const parsed = rawPhoneSchema.safeParse(phoneRaw)
@@ -39,9 +43,9 @@ export async function requestOtp(slug: string, phoneRaw: string): Promise<Reques
   const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
   if (!tenant) return { error: t('businessNotFound') }
 
-  // Normaliza con el país del negocio (E.164). El default 'CO' preserva el
-  // comportamiento histórico para los tenants ya existentes.
-  const phone = normalizePhoneToE164(parsed.data, tenant.countryCode)
+  // Normaliza con el país que eligió el cliente (default: el del negocio, ya que
+  // escaneó su QR). El país del negocio preserva el comportamiento histórico.
+  const phone = normalizePhoneToE164(parsed.data, countryCode ?? tenant.countryCode)
   if (!phone) return { error: t('invalidPhone') }
 
   const [program] = await db

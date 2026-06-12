@@ -2,33 +2,44 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { CountryDropdown } from '@/components/ui/country-dropdown'
+import { DEFAULT_COUNTRY } from '@/lib/countries'
+import { getLegalNoticeKey } from '@/lib/legal'
 import { requestOtp, verifyOtp } from './actions'
 
 interface PhoneFormProps {
   slug: string
+  /** ISO 3166-1 alpha-2 country code of the business (drives legal notice + dial code hint). */
+  countryCode?: string
 }
 
 type Step = 'phone' | 'code'
 
-export function PhoneForm({ slug }: PhoneFormProps) {
+export function PhoneForm({ slug, countryCode = DEFAULT_COUNTRY }: PhoneFormProps) {
   const router = useRouter()
   const t = useTranslations('customer.form')
+  const locale = useLocale() as 'es' | 'en' | 'pt'
   const [step, setStep] = useState<Step>('phone')
   const [phone, setPhone] = useState('')
+  // País del cliente: arranca en el del negocio (escaneó su QR), pero puede cambiarlo.
+  const [selectedCountry, setSelectedCountry] = useState(countryCode)
   const [sentTo, setSentTo] = useState('') // teléfono normalizado (E.164) del paso 1
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(false)
 
-  async function handleRequestOtp(e: React.FormEvent<HTMLFormElement>) {
+  // El aviso legal sigue atado al país del negocio (jurisdicción de tratamiento de datos).
+  const legalKey = getLegalNoticeKey(countryCode)
+
+  async function handleRequestOtp(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
     setError(undefined)
     setLoading(true)
     try {
-      const result = await requestOtp(slug, phone)
+      const result = await requestOtp(slug, phone, selectedCountry)
       if ('error' in result) {
         setError(result.error)
         return
@@ -42,7 +53,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
     }
   }
 
-  async function handleVerify(e: React.FormEvent<HTMLFormElement>) {
+  async function handleVerify(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
     setError(undefined)
     setLoading(true)
@@ -60,7 +71,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
     }
   }
 
-  function backToPhone() {
+  function backToPhone(): void {
     setStep('phone')
     setCode('')
     setError(undefined)
@@ -108,19 +119,40 @@ export function PhoneForm({ slug }: PhoneFormProps) {
 
   return (
     <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
-      <Input
-        type="tel"
-        label={t('phoneLabel')}
-        placeholder="+57 300 123 4567"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        error={error}
-        hint={t('phoneHint')}
-        disabled={loading}
-        autoComplete="tel"
-        inputMode="tel"
-        className="h-12 text-base"
-      />
+      {/* Phone input with dial code prefix badge */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-gray-700 select-none">
+          {t('phoneLabel')}
+        </label>
+        <div className="flex items-center gap-2">
+          <CountryDropdown
+            variant="compact"
+            locale={locale}
+            value={selectedCountry}
+            onChange={setSelectedCountry}
+            disabled={loading}
+          />
+          <input
+            type="tel"
+            placeholder="300 123 4567"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            disabled={loading}
+            autoComplete="tel"
+            inputMode="tel"
+            className="h-12 w-full min-w-0 rounded-xl border border-border bg-surface px-3.5 text-base text-fg placeholder:text-muted transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 hover:border-border-strong disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+        </div>
+        {error && (
+          <p className="text-xs text-red-500 flex items-center gap-1">
+            <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.75 3.75a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0v-3.5zm.75 7a.875.875 0 1 1 0-1.75.875.875 0 0 1 0 1.75z" />
+            </svg>
+            {error}
+          </p>
+        )}
+        <p className="text-xs text-gray-400">{t('phoneHint')}</p>
+      </div>
       <Button
         type="submit"
         variant="primary"
@@ -131,7 +163,7 @@ export function PhoneForm({ slug }: PhoneFormProps) {
       >
         {loading ? t('sending') : t('continue')}
       </Button>
-      <p className="text-center text-xs text-gray-400 pt-1 leading-relaxed">{t('habeas')}</p>
+      <p className="text-center text-xs text-gray-400 pt-1 leading-relaxed">{t(legalKey)}</p>
     </form>
   )
 }

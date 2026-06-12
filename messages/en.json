@@ -18,10 +18,13 @@
     "poweredBy": "Powered by",
     "form": {
       "phoneLabel": "Your mobile number",
+      "phonePrefix": "+{dialCode}",
       "phoneHint": "We'll send you a code on WhatsApp to identify you",
       "continue": "Continue with WhatsApp",
       "sending": "Sending code...",
       "habeas": "By continuing you accept the processing of your number under applicable data protection law. We don't share your information with third parties.",
+      "habeasCO": "By continuing you accept the processing of your number under Colombia's Ley 1581 de 2012 (Habeas Data). We don't share your information with third parties.",
+      "habeasGeneric": "By continuing you accept the processing of your personal data in accordance with applicable data protection law. We don't share your information with third parties.",
       "codeLabel": "Verification code",
       "codeHint": "Check your WhatsApp and enter the 6-digit code",
       "verify": "See my card",
@@ -219,7 +222,12 @@
     "rewardCustomDesc": "Define your own reward",
     "rewardCustomPlaceholder": "Describe the reward you will offer…",
     "saveChanges": "Save changes",
-    "startUsing": "Start using Sellio 🚀"
+    "startUsing": "Start using Sellio 🚀",
+    "countryLabel": "Business country",
+    "countryPlaceholder": "Select a country",
+    "timezoneLabel": "Timezone",
+    "timezonePlaceholder": "Select a timezone",
+    "localeNote": "Suggested language based on country: {locale}"
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -262,6 +270,8 @@
     "stampsMin": "Minimum 3 stamps",
     "stampsMax": "Maximum 30 stamps",
     "rewardTypeRequired": "Select a reward type",
+    "countryRequired": "Select a valid country",
+    "timezoneRequired": "Enter a timezone",
     "phoneMin7": "Number must have at least 7 digits",
     "phoneInvalidChars": "Only numbers, spaces and + symbol are allowed",
     "emailOrEmpty": "Invalid email",
