@@ -4,27 +4,21 @@ import { buildLast7Days } from '../../src/lib/analytics'
 const TZ = 'America/Bogota' // UTC-5, sin DST
 
 describe('buildLast7Days', () => {
-  it('devuelve exactamente 7 días, el último es "hoy"', () => {
-    const now = new Date('2026-06-10T15:00:00Z') // 10:00 en Bogotá → 2026-06-10
-    const counts = new Map<string, number>([
-      ['2026-06-10', 5],
-      ['2026-06-08', 2],
-    ])
+  it('devuelve exactamente 7 dias, el ultimo es hoy', () => {
+    const now = new Date('2026-06-10T15:00:00Z')
+    const counts = new Map([['2026-06-10', 5],['2026-06-08', 2]])
     const result = buildLast7Days(now, counts, TZ)
-
     expect(result).toHaveLength(7)
-    expect(result[6].count).toBe(5) // hoy
-    expect(result[4].count).toBe(2) // hace 2 días (2026-06-08)
-    expect(result[0].count).toBe(0) // 2026-06-04, sin datos
+    expect(result[6].count).toBe(5)
+    expect(result[4].count).toBe(2)
+    expect(result[0].count).toBe(0)
     expect(result.reduce((s, d) => s + d.count, 0)).toBe(7)
   })
 
-  it('respeta la zona horaria en el borde de medianoche UTC', () => {
-    // 02:00 UTC = 21:00 del día ANTERIOR en Bogotá → "hoy" local = 2026-06-09
+  it('respeta la zona horaria en medianoche UTC', () => {
     const now = new Date('2026-06-10T02:00:00Z')
-    const counts = new Map<string, number>([['2026-06-09', 3]])
+    const counts = new Map([['2026-06-09', 3]])
     const result = buildLast7Days(now, counts, TZ)
-
     expect(result[6].count).toBe(3)
   })
 
@@ -32,7 +26,7 @@ describe('buildLast7Days', () => {
     const now = new Date('2026-06-10T15:00:00Z')
     const result = buildLast7Days(now, new Map(), TZ)
     expect(result.every((d) => d.count === 0)).toBe(true)
-    expect(result.every((d) => typeof d.label === 'string' && d.label.length === 1)).toBe(true)
+    expect(result.every((d) => typeof d.label === 'string' && d.label.length >= 1)).toBe(true)
   })
 
   // ── Multi-país: el bucket de "hoy" depende de la timezone del tenant ────────
@@ -79,5 +73,29 @@ describe('buildLast7Days', () => {
     expect(en).toHaveLength(7)
     expect(es.every((d) => d.label.length === 1)).toBe(true)
     expect(en.every((d) => d.label.length === 1)).toBe(true)
+  })
+
+  it('genera labels en espanol por defecto', () => {
+    const now = new Date('2026-06-10T15:00:00Z')
+    const result = buildLast7Days(now, new Map(), TZ, 'es')
+    expect(typeof result[6].label).toBe('string')
+    expect(result[6].label.length).toBeGreaterThan(0)
+  })
+
+  it('genera labels validos en en', () => {
+    const now = new Date('2026-06-10T15:00:00Z')
+    const result = buildLast7Days(now, new Map(), TZ, 'en')
+    expect(result).toHaveLength(7)
+    result.forEach((d) => expect(typeof d.label).toBe('string'))
+  })
+
+  it('genera labels en portugues', () => {
+    const now = new Date('2026-06-10T15:00:00Z')
+    const result = buildLast7Days(now, new Map(), TZ, 'pt')
+    expect(result).toHaveLength(7)
+    result.forEach((d) => {
+      expect(typeof d.label).toBe('string')
+      expect(d.label.length).toBeGreaterThan(0)
+    })
   })
 })

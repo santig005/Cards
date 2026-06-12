@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/drizzle/db'
 import { tenants, loyaltyPrograms, customers, loyaltyCards } from '@/lib/drizzle/schema'
@@ -12,10 +13,12 @@ import { normalizePhoneToE164 } from '@/lib/loyalty'
 const NEW_CUSTOMER_WINDOW_MS = 60_000
 const MAX_NEW_CUSTOMERS_PER_WINDOW = 30
 
-const rawPhoneSchema = z
-  .string()
-  .min(7, 'El número debe tener al menos 7 dígitos')
-  .regex(/^\+?[0-9\s\-()]+$/, 'Solo se permiten números, espacios y el símbolo +')
+function buildRawPhoneSchema(phoneMin7: string, phoneInvalidChars: string) {
+  return z
+    .string()
+    .min(7, phoneMin7)
+    .regex(/^\+?[0-9\s\-()]+$/, phoneInvalidChars)
+}
 
 type RequestOtpResult = { phone: string } | { error: string }
 type VerifyOtpResult = { cardId: string } | { error: string }
@@ -25,25 +28,28 @@ type VerifyOtpResult = { cardId: string } | { error: string }
  * Devuelve el teléfono normalizado para reusarlo en la verificación.
  */
 export async function requestOtp(slug: string, phoneRaw: string): Promise<RequestOtpResult> {
+  const v = await getTranslations('validation')
+  const rawPhoneSchema = buildRawPhoneSchema(v('phoneMin7'), v('phoneInvalidChars'))
   const parsed = rawPhoneSchema.safeParse(phoneRaw)
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Número de teléfono inválido' }
+    return { error: parsed.error.issues[0]?.message ?? v('invalidData') }
   }
 
+  const t = await getTranslations('errors')
   const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
-  if (!tenant) return { error: 'Negocio no encontrado' }
+  if (!tenant) return { error: t('businessNotFound') }
 
   // Normaliza con el país del negocio (E.164). El default 'CO' preserva el
   // comportamiento histórico para los tenants ya existentes.
   const phone = normalizePhoneToE164(parsed.data, tenant.countryCode)
-  if (!phone) return { error: 'Número de teléfono inválido' }
+  if (!phone) return { error: t('invalidPhone') }
 
   const [program] = await db
     .select()
     .from(loyaltyPrograms)
     .where(and(eq(loyaltyPrograms.tenantId, tenant.id), eq(loyaltyPrograms.isActive, true)))
     .limit(1)
-  if (!program) return { error: 'Este negocio no tiene un programa de fidelización activo' }
+  if (!program) return { error: t('programNotFound') }
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithOtp({
@@ -52,7 +58,8 @@ export async function requestOtp(slug: string, phoneRaw: string): Promise<Reques
   })
 
   if (error) {
-    return { error: 'No pudimos enviar el código. Verificá tu número e intentá de nuevo.' }
+    const tc = await getTranslations('customer')
+    return { error: tc('form.otpSendError') }
   }
 
   return { phone }
@@ -72,23 +79,25 @@ export async function verifyOtp(
   token: string
 ): Promise<VerifyOtpResult> {
   const code = token.replace(/\D/g, '')
-  if (code.length < 4) return { error: 'Ingresá el código completo.' }
+  const tc = await getTranslations('customer')
+  if (code.length < 4) return { error: tc('form.codeHint') }
 
   const supabase = await createClient()
   const { data, error } = await supabase.auth.verifyOtp({ phone, token: code, type: 'sms' })
-  if (error || !data.user) return { error: 'Código incorrecto o vencido.' }
+  if (error || !data.user) return { error: tc('form.errorGeneric') }
   const user = data.user
 
   try {
+    const t = await getTranslations('errors')
     const [tenant] = await db.select().from(tenants).where(eq(tenants.slug, slug)).limit(1)
-    if (!tenant) return { error: 'Negocio no encontrado' }
+    if (!tenant) return { error: t('businessNotFound') }
 
     const [program] = await db
       .select()
       .from(loyaltyPrograms)
       .where(and(eq(loyaltyPrograms.tenantId, tenant.id), eq(loyaltyPrograms.isActive, true)))
       .limit(1)
-    if (!program) return { error: 'Este negocio no tiene un programa de fidelización activo' }
+    if (!program) return { error: t('programNotFound') }
 
     // Buscar / crear / reclamar la ficha del cliente.
     let [customer] = await db
@@ -105,14 +114,14 @@ export async function verifyOtp(
         .where(and(eq(customers.tenantId, tenant.id), gte(customers.createdAt, since)))
 
       if ((recent?.value ?? 0) >= MAX_NEW_CUSTOMERS_PER_WINDOW) {
-        return { error: 'Demasiados registros nuevos. Probá de nuevo en un minuto.' }
+        return { error: tc('form.tooManyRegistrations') }
       }
 
       const [newCustomer] = await db
         .insert(customers)
         .values({ tenantId: tenant.id, phone, authUserId: user.id })
         .returning()
-      if (!newCustomer) return { error: 'No se pudo crear el cliente' }
+      if (!newCustomer) return { error: tc('form.errorGeneric') }
       customer = newCustomer
     } else if (customer.authUserId !== user.id) {
       // Vincular (o re-vincular) la ficha al usuario verificado por este teléfono.
@@ -137,13 +146,14 @@ export async function verifyOtp(
         .insert(loyaltyCards)
         .values({ tenantId: tenant.id, customerId: customer.id, programId: program.id })
         .returning()
-      if (!newCard) return { error: 'No se pudo crear la tarjeta' }
+      if (!newCard) return { error: tc('form.errorGeneric') }
       card = newCard
     }
 
     return { cardId: card.id }
   } catch {
-    return { error: 'Ocurrió un error inesperado. Intentá de nuevo.' }
+    const tc2 = await getTranslations('customer')
+    return { error: tc2('form.errorGeneric') }
   }
 }
 
