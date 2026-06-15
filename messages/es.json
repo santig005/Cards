@@ -303,5 +303,18 @@
     "rewardBody": "En {business} ya podés reclamar: {reward}",
     "newStampTitle": "Nuevo sello en {business} ⭐",
     "newStampBody": "Llevás {stamps} de {required} sellos. ¡Seguí así!"
+  },
+  "pushOptIn": {
+    "title": "Notificaciones",
+    "description": "Avisarte cuando acumulás un sello nuevo o tu recompensa está lista.",
+    "enableButton": "Activar notificaciones",
+    "enabling": "Activando...",
+    "denied": "Las notificaciones están bloqueadas. Para reactivarlas, entrá a los ajustes de tu navegador y permití las notificaciones para este sitio.",
+    "prefReward": "Recompensa lista",
+    "prefNewStamp": "Nuevo sello",
+    "disable": "Desactivar notificaciones",
+    "notNow": "Ahora no",
+    "error": "No se pudo completar la acción. Intentá de nuevo.",
+    "subscribed": "Notificaciones activas"
   }
 }
