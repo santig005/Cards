@@ -162,6 +162,34 @@ propia credencial.
 
 ---
 
+---
+
+## Actualización 2026-06-15 — Web Push (etapa 1) en construcción
+
+Se decidió construir la **etapa 1** de la secuencia (PWA-lite + Web Push). La PWA instalable
+ya existía (`manifest.webmanifest`, `public/sw.js`, `PwaRegister`); esta etapa agrega la capa de
+**Web Push**. Respuestas a las preguntas abiertas que aplican a esta etapa (consultadas al humano):
+
+- **Q1 (qué primero):** Web Push primero (esta etapa). Google Wallet después.
+- **Q7 (preferencias):** **granulares por tipo** → columnas `customers.notify_reward` y
+  `customers.notify_new_stamp` (default true). El cliente activa/desactiva cada tipo.
+- **Q8 (re-oferta tras rechazo):** **re-ofrecer tras N visitas** mediante contador en
+  `localStorage` (sin schema). Se implementa en el frontend (etapa 1B).
+- **Q9 (abstracción):** **interfaz de canal desde día 1**. `src/lib/notifications/` con
+  `NotificationChannel`, `webPushChannel` y `notifyCustomer()` que hace fan-out; sumar
+  Wallet/WhatsApp es agregar un canal al array, sin tocar el dominio.
+
+Las preguntas **Q2, Q3, Q4, Q5, Q6** son específicas de Wallet y **siguen abiertas** para esa fase.
+
+**Backend entregado (PR-A):** migración `0005_push_subscriptions.sql` (tabla `push_subscriptions`
++ prefs en `customers`, RLS self del cliente), servicio de notificación agnóstico, handlers `push`/
+`notificationclick` en el SW, y disparo desde `addStamp` (`reward` si la tarjeta se llenó, si no
+`new_stamp`; copy localizado al `locale` del negocio; best-effort fuera de la transacción).
+**Pendiente (PR-B, frontend):** opt-in + toggles de preferencias + suscripción del navegador +
+re-oferta por visitas. **Inactividad (scheduler) queda fuera** de esta etapa.
+
+---
+
 *Documento vivo. Actualizar a medida que se decida y construya cada canal. Relacionado:
 [ADR-004 (OTP del cliente)](./ADR-004-customer-otp.md), `docs/lista-de-deseos.md` (PWA, Wallet,
 notificaciones).*

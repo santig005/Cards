@@ -46,6 +46,9 @@ export const customers = pgTable('customers', {
   name: text('name'),
   email: text('email'),
   authUserId: uuid('auth_user_id'), // ref → auth.users (nullable: se asigna tras OTP)
+  // ── Preferencias de notificaciones push (ver feat/web-push) ───────────────
+  notifyReward: boolean('notify_reward').notNull().default(true), // avisar cuando la recompensa está lista
+  notifyNewStamp: boolean('notify_new_stamp').notNull().default(true), // avisar cuando suma un sello
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -74,6 +77,18 @@ export const stampEvents = pgTable('stamp_events', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// ─── Push subscriptions (suscripciones Web Push del cliente final) ────────────
+
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tenantId: uuid('tenant_id').notNull(), // RLS anchor
+  customerId: uuid('customer_id').notNull(),
+  endpoint: text('endpoint').notNull().unique(), // URL del push endpoint del navegador; única globalmente
+  p256dh: text('p256dh').notNull(), // clave pública de la suscripción
+  auth: text('auth').notNull(), // secreto de auth de la suscripción
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type Tenant = typeof tenants.$inferSelect
@@ -90,3 +105,6 @@ export type NewLoyaltyCard = typeof loyaltyCards.$inferInsert
 
 export type StampEvent = typeof stampEvents.$inferSelect
 export type NewStampEvent = typeof stampEvents.$inferInsert
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect
+export type NewPushSubscription = typeof pushSubscriptions.$inferInsert

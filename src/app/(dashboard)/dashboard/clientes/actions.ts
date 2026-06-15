@@ -8,6 +8,7 @@ import { withAuth } from '@/lib/drizzle/db'
 import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
 import { applyStamp, canRedeem, isWithinCooldown } from '@/lib/loyalty'
+import { notifyCustomer } from '@/lib/notifications'
 
 // Anti-fraude / anti-doble-tap: no se puede registrar otro sello en la misma
 // tarjeta antes de que pasen estos segundos. Límite a nivel DB (sirve aunque
@@ -34,6 +35,20 @@ export async function addStamp(cardId: string): Promise<AddStampResult> {
   const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
   if (!user) return { error: t('unauthorized') }
+
+  // Contexto para notificar al cliente DESPUÉS de confirmar la transacción
+  // (la notificación nunca debe correr dentro de la tx ni romper la action).
+  let notifyCtx: {
+    tenantId: string
+    customerId: string
+    slug: string
+    locale: string
+    business: string
+    reward: string
+    stamps: number
+    stampsRequired: number
+    full: boolean
+  } | null = null
 
   const result = await withAuth(user.id, async (tx): Promise<AddStampResult> => {
     const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
@@ -78,11 +93,75 @@ export async function addStamp(cardId: string): Promise<AddStampResult> {
       eventType: 'stamp',
     })
 
+    notifyCtx = {
+      tenantId: tenant.id,
+      customerId: card.customerId,
+      slug: tenant.slug,
+      locale: tenant.locale,
+      business: tenant.name,
+      reward: program.rewardDescription,
+      stamps: outcome.next,
+      stampsRequired: program.stampsRequired,
+      full: outcome.full,
+    }
+
     return { success: true, full: outcome.full, stamps: outcome.next, stampsRequired: program.stampsRequired }
   })
 
-  if ('success' in result) revalidate()
+  if ('success' in result) {
+    revalidate()
+    if (notifyCtx) await dispatchStampNotification(notifyCtx)
+  }
   return result
+}
+
+/**
+ * Notifica al cliente tras un sello confirmado: 'reward' si la tarjeta quedó
+ * lista, 'new_stamp' si solo sumó. Best-effort: cualquier fallo se traga para
+ * no afectar el flujo del cajero. El idioma es el del negocio (tenant.locale).
+ */
+async function dispatchStampNotification(ctx: {
+  tenantId: string
+  customerId: string
+  slug: string
+  locale: string
+  business: string
+  reward: string
+  stamps: number
+  stampsRequired: number
+  full: boolean
+}): Promise<void> {
+  try {
+    const tp = await getTranslations({ locale: ctx.locale, namespace: 'push' })
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+    const url = `${appUrl}/c/${ctx.slug}`
+
+    if (ctx.full) {
+      await notifyCustomer({
+        tenantId: ctx.tenantId,
+        customerId: ctx.customerId,
+        kind: 'reward',
+        payload: {
+          title: tp('rewardTitle'),
+          body: tp('rewardBody', { business: ctx.business, reward: ctx.reward }),
+          url,
+        },
+      })
+    } else {
+      await notifyCustomer({
+        tenantId: ctx.tenantId,
+        customerId: ctx.customerId,
+        kind: 'new_stamp',
+        payload: {
+          title: tp('newStampTitle', { business: ctx.business }),
+          body: tp('newStampBody', { stamps: ctx.stamps, required: ctx.stampsRequired }),
+          url,
+        },
+      })
+    }
+  } catch (err) {
+    console.error('[addStamp] notificación push falló:', err)
+  }
 }
 
 type RedeemResult = { error: string } | { success: true; rewardDescription: string }
