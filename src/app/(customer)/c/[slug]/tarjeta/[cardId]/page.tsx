@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
 import { logoutCustomer } from '../../actions'
 import { ConfettiTrigger } from '@/components/features/confetti-trigger'
+import { PushOptIn } from '@/components/features/push-opt-in'
 
 interface PageProps {
   params: Promise<{ slug: string; cardId: string }>
@@ -319,6 +320,13 @@ export default async function CardPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {/* Opt-in de notificaciones Web Push */}
+      <PushOptIn
+        cardId={cardId}
+        vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''}
+        initialPrefs={{ notifyReward: customer.notifyReward, notifyNewStamp: customer.notifyNewStamp }}
+      />
 
       {/* Save link tip */}
       <p className="text-stone-600 text-xs text-center max-w-xs px-4">{t('saveTip')}</p>

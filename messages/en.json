@@ -303,5 +303,18 @@
     "rewardBody": "At {business} you can now claim: {reward}",
     "newStampTitle": "New stamp at {business} ⭐",
     "newStampBody": "You have {stamps} of {required} stamps. Keep it up!"
+  },
+  "pushOptIn": {
+    "title": "Notifications",
+    "description": "Get notified when you earn a new stamp or your reward is ready to claim.",
+    "enableButton": "Enable notifications",
+    "enabling": "Enabling...",
+    "denied": "Notifications are blocked. To re-enable them, open your browser settings and allow notifications for this site.",
+    "prefReward": "Reward ready",
+    "prefNewStamp": "New stamp",
+    "disable": "Disable notifications",
+    "notNow": "Not now",
+    "error": "Could not complete the action. Please try again.",
+    "subscribed": "Notifications active"
   }
 }

@@ -303,5 +303,18 @@
     "rewardBody": "No {business} você já pode resgatar: {reward}",
     "newStampTitle": "Novo selo em {business} ⭐",
     "newStampBody": "Você tem {stamps} de {required} selos. Continue assim!"
+  },
+  "pushOptIn": {
+    "title": "Notificações",
+    "description": "Receba avisos quando acumular um novo selo ou sua recompensa estiver pronta.",
+    "enableButton": "Ativar notificações",
+    "enabling": "Ativando...",
+    "denied": "As notificações estão bloqueadas. Para reativá-las, acesse as configurações do seu navegador e permita notificações para este site.",
+    "prefReward": "Recompensa pronta",
+    "prefNewStamp": "Novo selo",
+    "disable": "Desativar notificações",
+    "notNow": "Agora não",
+    "error": "Não foi possível concluir a ação. Tente novamente.",
+    "subscribed": "Notificações ativas"
   }
 }
