@@ -297,5 +297,11 @@
     "checkEmail": "Verifique seu email para confirmar sua conta antes de entrar.",
     "invalidPhone": "Número de telefone inválido",
     "otpSendError": "Não conseguimos enviar o código. Verifique seu número e tente novamente."
+  },
+  "push": {
+    "rewardTitle": "Sua recompensa está pronta! 🎉",
+    "rewardBody": "No {business} você já pode resgatar: {reward}",
+    "newStampTitle": "Novo selo em {business} ⭐",
+    "newStampBody": "Você tem {stamps} de {required} selos. Continue assim!"
   }
 }
