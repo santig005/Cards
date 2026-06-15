@@ -3,9 +3,8 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
-import { withAuth } from '@/lib/drizzle/db'
-import { tenants, customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
+import { withTenantTx } from '@/lib/tenant'
+import { customers, loyaltyCards, loyaltyPrograms, stampEvents } from '@/lib/drizzle/schema'
 import { and, desc, eq } from 'drizzle-orm'
 import { applyStamp, canRedeem, isWithinCooldown } from '@/lib/loyalty'
 import { notifyCustomer } from '@/lib/notifications'
@@ -31,10 +30,7 @@ type AddStampResult =
  * "lista" y espera el canje manual del cajero (`redeemReward`).
  */
 export async function addStamp(cardId: string): Promise<AddStampResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
 
   // Contexto para notificar al cliente DESPUÉS de confirmar la transacción
   // (la notificación nunca debe correr dentro de la tx ni romper la action).
@@ -50,10 +46,7 @@ export async function addStamp(cardId: string): Promise<AddStampResult> {
     full: boolean
   } | null = null
 
-  const result = await withAuth(user.id, async (tx): Promise<AddStampResult> => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: t('businessNotFound') }
-
+  const result = await withTenantTx(async ({ user, tenant, tx }): Promise<AddStampResult> => {
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
     if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
@@ -171,15 +164,9 @@ type RedeemResult = { error: string } | { success: true; rewardDescription: stri
  * la tarjeta y se cuenta el canje.
  */
 export async function redeemReward(cardId: string): Promise<RedeemResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
 
-  const result = await withAuth(user.id, async (tx): Promise<RedeemResult> => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: t('businessNotFound') }
-
+  const result = await withTenantTx(async ({ user, tenant, tx }): Promise<RedeemResult> => {
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
     if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
@@ -217,15 +204,9 @@ type UndoResult = { error: string } | { success: true; stamps: number }
 
 /** Deshace el último sello (corrección de error del cajero), dentro de una ventana. */
 export async function undoLastStamp(cardId: string): Promise<UndoResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
 
-  const result = await withAuth(user.id, async (tx): Promise<UndoResult> => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: t('businessNotFound') }
-
+  const result = await withTenantTx(async ({ tenant, tx }): Promise<UndoResult> => {
     const [card] = await tx.select().from(loyaltyCards).where(eq(loyaltyCards.id, cardId)).limit(1)
     if (!card || card.tenantId !== tenant.id) return { error: t('cardNotFound') }
 
@@ -272,11 +253,7 @@ export async function updateCustomer(
   customerId: string,
   input: { name?: string; email?: string }
 ): Promise<UpdateCustomerResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
-
   const v = await getTranslations('validation')
   const schema = buildUpdateCustomerSchema(v('nameMax80'), v('emailOrEmpty'))
   const parsed = schema.safeParse(input)
@@ -284,10 +261,7 @@ export async function updateCustomer(
     return { error: parsed.error.issues[0]?.message ?? v('invalidData') }
   }
 
-  const result = await withAuth(user.id, async (tx): Promise<UpdateCustomerResult> => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: t('businessNotFound') }
-
+  const result = await withTenantTx(async ({ tenant, tx }): Promise<UpdateCustomerResult> => {
     const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
     // RLS ya aísla por tenant; este check es defensa en profundidad.
     if (!customer || customer.tenantId !== tenant.id) return { error: t('customerNotFound') }
@@ -311,15 +285,9 @@ type DeleteCustomerResult = { error: string } | { success: true }
 
 /** Elimina un cliente del negocio junto con sus tarjetas y eventos. */
 export async function deleteCustomer(customerId: string): Promise<DeleteCustomerResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
 
-  const result = await withAuth(user.id, async (tx): Promise<DeleteCustomerResult> => {
-    const [tenant] = await tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-    if (!tenant) return { error: t('businessNotFound') }
-
+  const result = await withTenantTx(async ({ tenant, tx }): Promise<DeleteCustomerResult> => {
     const [customer] = await tx.select().from(customers).where(eq(customers.id, customerId)).limit(1)
     if (!customer || customer.tenantId !== tenant.id) return { error: t('customerNotFound') }
 

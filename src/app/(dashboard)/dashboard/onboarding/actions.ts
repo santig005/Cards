@@ -2,9 +2,9 @@
 
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { withAuth } from '@/lib/drizzle/db'
+import { getAuthedTenant } from '@/lib/tenant'
 import { tenants, loyaltyPrograms } from '@/lib/drizzle/schema'
 import { buildCreateProgramSchema } from '@/lib/validations/onboarding'
 import { eq } from 'drizzle-orm'
@@ -62,18 +62,9 @@ export async function createProgram(formData: FormData) {
     return { error: result.error.issues[0].message }
   }
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  const t = await getTranslations('errors')
-  if (!user) return { error: t('unauthorized') }
-
-  const [tenant] = await withAuth(user.id, (tx) =>
-    tx.select().from(tenants).where(eq(tenants.ownerId, user.id)).limit(1)
-  )
-  if (!tenant) return { error: t('businessNotFound') }
+  const authed = await getAuthedTenant()
+  if ('error' in authed) return authed
+  const { user, tenant } = authed
 
   // Logo opcional: se sube antes del upsert para guardar la URL en el mismo update.
   let logoUrl: string | null = null
