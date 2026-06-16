@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, char, integer, boolean, timestamp, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, char, integer, boolean, timestamp, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core'
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
@@ -89,6 +89,25 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+export const walletPasses = pgTable(
+  'wallet_passes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tenantId: uuid('tenant_id').notNull(), // RLS anchor
+    customerId: uuid('customer_id').notNull(),
+    cardId: uuid('card_id').notNull(), // la loyalty_card que el pase refleja
+    channel: text('channel').notNull().default('google'), // 'google' (futuro: 'apple')
+    objectId: text('object_id').notNull(), // id del Loyalty Object en Google (issuerId.suffix)
+    classId: text('class_id').notNull(), // id de la Loyalty Class en Google
+    status: text('status').notNull().default('active'), // 'active' | 'revoked'
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    uniqCardChannel: uniqueIndex('uniq_wallet_passes_card_channel').on(table.cardId, table.channel),
+  }),
+)
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type Tenant = typeof tenants.$inferSelect
@@ -108,3 +127,6 @@ export type NewStampEvent = typeof stampEvents.$inferInsert
 
 export type PushSubscription = typeof pushSubscriptions.$inferSelect
 export type NewPushSubscription = typeof pushSubscriptions.$inferInsert
+
+export type WalletPass = typeof walletPasses.$inferSelect
+export type NewWalletPass = typeof walletPasses.$inferInsert

@@ -7,10 +7,11 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/lib/drizzle/db'
 import { customers } from '@/lib/drizzle/schema'
 import { webPushChannel } from './web-push-channel'
+import { googleWalletChannel } from './google-wallet-channel'
 import type { NotificationChannel, NotificationKind, NotificationPayload } from './types'
 
-// Re-exportar tipos y canal por conveniencia para quien importe desde aquí
-export { webPushChannel }
+// Re-exportar tipos y canales por conveniencia para quien importe desde aquí
+export { webPushChannel, googleWalletChannel }
 export type { NotificationChannel, NotificationKind, NotificationPayload }
 
 // ─── Canales activos ──────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ export type { NotificationChannel, NotificationKind, NotificationPayload }
  * Lista de canales de notificación habilitados.
  * Extensible sin modificar notifyCustomer: agregar WhatsApp, Apple Wallet, etc.
  */
-const channels: NotificationChannel[] = [webPushChannel]
+const channels: NotificationChannel[] = [webPushChannel, googleWalletChannel]
 
 // ─── Función principal ────────────────────────────────────────────────────────
 
@@ -68,7 +69,7 @@ export async function notifyCustomer({
   // Fan-out a todos los canales; un canal caído no aborta los demás
   await Promise.allSettled(
     channels.map((channel) =>
-      channel.send({ tenantId, customerId, payload }).catch((err: unknown) => {
+      channel.send({ tenantId, customerId, kind, payload }).catch((err: unknown) => {
         // Capa de seguridad extra: si el canal lanza síncronamente o promesa rechazada
         // no capturada internamente, lo registramos aquí sin propagar.
         console.error(`[notifications] Canal "${channel.name}" falló:`, err)

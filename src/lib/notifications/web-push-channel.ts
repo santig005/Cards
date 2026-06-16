@@ -6,7 +6,7 @@ import webpush from 'web-push'
 import { eq, and } from 'drizzle-orm'
 import { db } from '@/lib/drizzle/db'
 import { pushSubscriptions } from '@/lib/drizzle/schema'
-import type { NotificationChannel, NotificationPayload } from './types'
+import type { NotificationChannel, NotificationSendArgs } from './types'
 
 // ─── Configuración VAPID (lazy, una sola vez por proceso) ────────────────────
 
@@ -62,14 +62,9 @@ function isExpiredSubscription(err: unknown): boolean {
 export const webPushChannel: NotificationChannel = {
   name: 'web_push',
 
-  async send({
-    customerId,
-    payload,
-  }: {
-    tenantId: string
-    customerId: string
-    payload: NotificationPayload
-  }): Promise<void> {
+  // Nota: este canal ignora `kind` — el filtrado por preferencia ya ocurre en
+  // notifyCustomer; aquí sólo despachamos el payload tal cual.
+  async send({ customerId, payload }: NotificationSendArgs): Promise<void> {
     // Si no hay claves VAPID configuradas, actuar como NO-OP
     if (!initVapid()) return
 

@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { logoutCustomer } from '../../actions'
 import { ConfettiTrigger } from '@/components/features/confetti-trigger'
 import { PushOptIn } from '@/components/features/push-opt-in'
+import { SaveToWallet } from '@/components/features/save-to-wallet'
+import { isGoogleWalletConfigured } from '@/lib/wallet/google'
 
 interface PageProps {
   params: Promise<{ slug: string; cardId: string }>
@@ -121,6 +123,9 @@ export default async function CardPage({ params }: PageProps) {
   if (!program) {
     notFound()
   }
+
+  // Verificar en el servidor si Google Wallet está configurado para mostrar el botón.
+  const walletEnabled = isGoogleWalletConfigured()
 
   const isRedeemable = card.currentStamps >= program.stampsRequired
   const progressPercent = Math.min(
@@ -327,6 +332,9 @@ export default async function CardPage({ params }: PageProps) {
         vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''}
         initialPrefs={{ notifyReward: customer.notifyReward, notifyNewStamp: customer.notifyNewStamp }}
       />
+
+      {/* Botón "Add to Google Wallet" — solo visible si el servicio está configurado */}
+      <SaveToWallet cardId={cardId} enabled={walletEnabled} />
 
       {/* Save link tip */}
       <p className="text-stone-600 text-xs text-center max-w-xs px-4">{t('saveTip')}</p>

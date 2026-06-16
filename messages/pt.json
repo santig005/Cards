@@ -304,6 +304,12 @@
     "newStampTitle": "Novo selo em {business} ⭐",
     "newStampBody": "Você tem {stamps} de {required} selos. Continue assim!"
   },
+  "wallet": {
+    "addToWallet": "Adicionar ao Google Wallet",
+    "adding": "Abrindo Wallet...",
+    "error": "Não foi possível abrir o Google Wallet. Tente novamente.",
+    "notConfigured": "O Google Wallet não está disponível no momento."
+  },
   "pushOptIn": {
     "title": "Notificações",
     "description": "Receba avisos quando acumular um novo selo ou sua recompensa estiver pronta.",
