@@ -12,14 +12,23 @@ export type NotificationPayload = {
   url: string
 }
 
+/** Argumentos que recibe un canal al enviar una notificación */
+export type NotificationSendArgs = {
+  tenantId: string
+  customerId: string
+  /**
+   * Tipo de notificación. Permite a los canales decidir comportamiento según el
+   * evento (ej. el canal de Google Wallet agrega un mensaje sólo en 'reward').
+   * Los canales que no lo necesiten (ej. web push) pueden ignorarlo.
+   */
+  kind: NotificationKind
+  payload: NotificationPayload
+}
+
 /** Contrato que debe implementar cada canal de notificación */
 export interface NotificationChannel {
   /** Nombre identificador del canal (para logs y futuros toggles) */
   name: string
   /** Envía la notificación al cliente indicado dentro del tenant */
-  send(args: {
-    tenantId: string
-    customerId: string
-    payload: NotificationPayload
-  }): Promise<void>
+  send(args: NotificationSendArgs): Promise<void>
 }

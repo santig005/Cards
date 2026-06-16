@@ -304,6 +304,12 @@
     "newStampTitle": "New stamp at {business} ⭐",
     "newStampBody": "You have {stamps} of {required} stamps. Keep it up!"
   },
+  "wallet": {
+    "addToWallet": "Add to Google Wallet",
+    "adding": "Opening Wallet...",
+    "error": "Could not open Google Wallet. Please try again.",
+    "notConfigured": "Google Wallet is not available right now."
+  },
   "pushOptIn": {
     "title": "Notifications",
     "description": "Get notified when you earn a new stamp or your reward is ready to claim.",
